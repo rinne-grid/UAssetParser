@@ -4,14 +4,14 @@ using UAssetParser.Formats;
 
 namespace UAssetParser.Objects.Visitors.Unreal
 {
-    [DataContract, Description("IntProperty"), Category("Unreal")]
-    public class UIntProperty : FPropertyTag
+    [DataContract, Description("UInt32Property"), Category("Unreal")]
+    public class UInt32Property : FPropertyTag
     {
         [DataMember]
         public FPropertyGuid Guid { get; set; }
 
         [DataMember]
-        public int Value { get; set; }
+        public uint Value { get; set; }
 
         public override object GetValue()
         {
