@@ -7,8 +7,11 @@ namespace UAssetParser.Formats
     [DebuggerDisplay("[FName {Name} ({Index})]")]
     public class FName
     {
-        [DataMember, Size(8)]
+        [DataMember]
         public int Index { get; set; }
+        
+        [DataMember]
+        public int ExIndex { get; set; }
 
         [IgnoreDataMember]
         public string Name { get; set; }
