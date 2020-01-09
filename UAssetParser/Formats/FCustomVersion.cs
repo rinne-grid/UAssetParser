@@ -8,5 +8,8 @@ namespace UAssetParser.Formats
     {
         [DataMember]
         public Guid Key { get; set; }
+
+        [DataMember]
+        public int Version { get; set; }
     }
 }
