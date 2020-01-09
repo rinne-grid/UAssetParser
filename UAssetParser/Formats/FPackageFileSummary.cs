@@ -129,5 +129,9 @@ namespace UAssetParser.Formats
 
         [DataMember, Description(nameof(ExportOffset)), Category(nameof(ExportCount))]
         public FObjectExport[] Exports { get; set; }
+
+        // Just collection of Int32 - index-references. Negative count for none.
+        [DataMember, Description(nameof(PreloadDependencyOffset)), Category(nameof(PreloadDependencyCount))]
+        public FPreloadDependencyIndex[] PreloadDependencies { get; set; }
     }
 }
