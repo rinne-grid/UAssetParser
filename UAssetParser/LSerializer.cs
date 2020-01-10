@@ -164,6 +164,7 @@ namespace UAssetParser
 
         private static Array FArray(BinaryReader reader, int count, Type T)
         {
+            count = count * Convert.ToInt32(count > 0); // workaround for PreloadDep negative count
             var array = Array.CreateInstance(T, count);
             for (int i = 0; i < count; ++i)
             {

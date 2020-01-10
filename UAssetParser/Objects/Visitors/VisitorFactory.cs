@@ -44,7 +44,14 @@ namespace UAssetParser.Objects.Visitors
             { "BoolProprety", (r,s,c) => r.ReadByte() == 1 },
             { "IntProperty", (r,s,c) => r.ReadInt32() },
             { "UInt32Property", (r,s,c) => r.ReadUInt32() },
-            { "ByteProperty", (r,s,c) => r.ReadByte() },
+            { "ByteProperty", (r,s,c) =>
+            {
+                if (c == 1)
+                    return r.ReadByte();
+                var fk = LSerializer.Deserialize<FName>(r);
+                fk.Ref(s);
+                return fk;
+            } },
             { "FloatProperty", (r,s,c) => r.ReadSingle() },
             { "StrProperty", (r,s,c) => LSerializer.FString(r) },
             { "EnumProperty", (r,s,c) =>

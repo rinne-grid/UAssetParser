@@ -30,7 +30,7 @@ namespace UAssetParser.Objects.Visitors.Unreal
             var instance = LSerializer.Deserialize<USetProperty>(reader);
             instance.Ref(summary);
             var @base = reader.BaseStream.Position;
-            instance.Entries = UArrayProperty.GetEntries(instance.Count, instance.ArrayType, reader, summary);
+            instance.Entries = UArrayProperty.GetEntries(instance.Count, instance.Size, instance.ArrayType, reader, summary);
             reader.BaseStream.Position = @base + instance.Size - 8;
             return instance;
         }

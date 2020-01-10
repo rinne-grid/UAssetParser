@@ -35,23 +35,27 @@ namespace UAssetParser.Objects.Visitors.Unreal
             instance.Ref(summary);
 
             var @base = reader.BaseStream.Position;
-            instance.Entries = GetEntries(instance.ArraySize, instance.ArrayType, reader, summary);
+            instance.Entries = GetEntries(instance.ArraySize, instance.Size, instance.ArrayType, reader, summary);
             reader.BaseStream.Position = @base + instance.Size - 4;
             return instance;
         }
 
-        public static List<object> GetEntries(int arraySize, FName arrayType, BinaryReader reader, FPackageFileSummary summary)
+        public static List<object> GetEntries(int arraySize, int objSize, FName arrayType, BinaryReader reader, FPackageFileSummary summary)
         {
             var entries = new List<object>();
-            if (arrayType == "StructProperty")
+            if (arraySize > 0)
             {
-                entries.Add(VisitorFactory.VisitEnumerable(reader, arrayType, summary, arraySize));
-            }
-            else
-            {
-                for (int i = 0; i < arraySize; ++i)
+                var BASize = (objSize - 4) / arraySize;
+                if (arrayType == "StructProperty")
                 {
-                    entries.Add(VisitorFactory.VisitEnumerable(reader, arrayType, summary, 1));
+                    entries.Add(VisitorFactory.VisitEnumerable(reader, arrayType, summary, arraySize));
+                }
+                else
+                {
+                    for (int i = 0; i < arraySize; ++i)
+                    {
+                        entries.Add(VisitorFactory.VisitEnumerable(reader, arrayType, summary, BASize));
+                    }
                 }
             }
             return entries;
