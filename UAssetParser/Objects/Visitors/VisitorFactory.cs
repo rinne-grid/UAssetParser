@@ -47,7 +47,7 @@ namespace UAssetParser.Objects.Visitors
             { "ShortProperty", (r,s,c) => r.ReadInt16() },
             { "UShortProperty", (r,s,c) => r.ReadUInt16() },
             { "IntProperty", (r,s,c) => r.ReadInt32() },
-            { "UIntProperty", (r,s,c) => r.ReadInt32() },
+            { "UIntProperty", (r,s,c) => r.ReadUInt32() },
             { "Int32Property", (r,s,c) => r.ReadInt32() },
             { "UInt32Property", (r,s,c) => r.ReadUInt32() },
             { "Int64Property", (r,s,c) => r.ReadInt64() },
