@@ -1,14 +1,14 @@
 ﻿using System;
 using JetBrains.Annotations;
-using UObject.Package;
+using UObject.Asset;
 
 namespace UObject.Properties
 {
     [PublicAPI]
     public class StructProperty : IObjectProperty
     {
-        public int Deserialize(Span<byte> buffer, AssetFile asset) => throw new NotImplementedException();
+        public void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor) => throw new NotImplementedException();
 
-        public int Serialize(Span<byte> buffer, AssetFile asset) => throw new NotImplementedException();
+        public void Serialize(Span<byte> buffer, AssetFile asset, ref int cursor) => throw new NotImplementedException();
     }
 }

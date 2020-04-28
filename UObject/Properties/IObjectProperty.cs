@@ -1,13 +1,13 @@
 ﻿using System;
 using JetBrains.Annotations;
-using UObject.Package;
+using UObject.Asset;
 
 namespace UObject.Properties
 {
     [PublicAPI]
     public interface IObjectProperty
     {
-        int Deserialize(Span<byte> buffer, AssetFile asset);
-        int Serialize(Span<byte> buffer, AssetFile asset);
+        void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor);
+        void Serialize(Span<byte> buffer, AssetFile asset, ref int cursor);
     }
 }

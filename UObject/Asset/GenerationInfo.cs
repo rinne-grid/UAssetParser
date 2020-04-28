@@ -1,9 +1,9 @@
 ﻿using JetBrains.Annotations;
 
-namespace UObject.Package
+namespace UObject.Asset
 {
     [PublicAPI]
-    public class GenerationInfo
+    public struct GenerationInfo
     {
         public int ExportCount { get; set; }
         public int NameCount { get; set; }

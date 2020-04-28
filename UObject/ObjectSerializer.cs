@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Buffers.Binary;
 using System.Collections.Generic;
+using System.Text;
+using DragonLib.IO;
 using JetBrains.Annotations;
+using UObject.Asset;
 using UObject.ObjectModel;
-using UObject.Package;
 using UObject.Properties;
 using UObject.Structs;
 
@@ -40,8 +43,49 @@ namespace UObject
 
         public static Span<byte> SerializeSummary(PackageFileSummary summary, List<UnrealObject> uasset) => throw new NotImplementedException();
 
-        public static string DeserializeString(Span<byte> buffer) => throw new NotImplementedException();
+        public static string DeserializeString(Span<byte> buffer, ref int cursor)
+        {
+            var count = SpanHelper.ReadLittleInt(buffer, ref cursor);
+            var str = default(string);
+            if (count > 0)
+            {
+                str = count == 1 ? string.Empty : Encoding.UTF8.GetString(buffer.Slice(cursor, count - 1));
+                cursor += count;
+            }
+            else if (count < 0)
+            {
+                str = count == -1 ? string.Empty : Encoding.Unicode.GetString(buffer.Slice(cursor, (0 - count) * 2 - 2));
+                cursor += count * 2;
+            }
 
-        public static Span<byte> SerializeString(Span<byte> buffer) => throw new NotImplementedException();
+            return str;
+        }
+
+        public static Span<byte> SerializeString(string text)
+        {
+            if (text == null) return new Span<byte>(new byte[4]);
+            if (text == string.Empty)
+            {
+                var empty = new Span<byte>(new byte[5]);
+                BinaryPrimitives.WriteInt32LittleEndian(empty, 1);
+                return empty;
+            }
+
+            var length = text.Length + 1;
+            var utf16 = false;
+            var bufferLength = Encoding.UTF8.GetByteCount(text);
+            if (bufferLength + 1 != length)
+            {
+                utf16 = true;
+                bufferLength = Encoding.Unicode.GetByteCount(text);
+            }
+
+            var span = new Span<char>(text.ToCharArray());
+            var blob = new Span<byte>(new byte[4 + bufferLength + 1]);
+            BinaryPrimitives.WriteInt32LittleEndian(blob, utf16 ? 0 - length : length);
+            if (utf16) Encoding.Unicode.GetBytes(span, blob.Slice(4));
+            else Encoding.UTF8.GetBytes(span, blob.Slice(4));
+            return blob;
+        }
     }
 }

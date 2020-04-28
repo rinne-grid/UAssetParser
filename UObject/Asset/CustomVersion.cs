@@ -1,7 +1,7 @@
 ﻿using System;
 using JetBrains.Annotations;
 
-namespace UObject.Package
+namespace UObject.Asset
 {
     [PublicAPI]
     public struct CustomVersion
