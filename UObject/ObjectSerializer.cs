@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Text;
 using DragonLib.IO;
@@ -61,31 +60,30 @@ namespace UObject
             return str;
         }
 
-        public static Span<byte> SerializeString(string text)
+        public static void SerializeString(Span<byte> buffer, string text, ref int cursor)
         {
-            if (text == null) return new Span<byte>(new byte[4]);
+            if (text == null) return;
             if (text == string.Empty)
             {
-                var empty = new Span<byte>(new byte[5]);
-                BinaryPrimitives.WriteInt32LittleEndian(empty, 1);
-                return empty;
+                SpanHelper.WriteLittleInt(buffer, 1, ref cursor);
+                cursor += 1;
             }
 
             var length = text.Length + 1;
             var utf16 = false;
-            var bufferLength = Encoding.UTF8.GetByteCount(text);
-            if (bufferLength + 1 != length)
+            var bufferLength = Encoding.UTF8.GetByteCount(text) + 1;
+            if (bufferLength != length)
             {
                 utf16 = true;
-                bufferLength = Encoding.Unicode.GetByteCount(text);
+                bufferLength = Encoding.Unicode.GetByteCount(text) + 2;
             }
 
             var span = new Span<char>(text.ToCharArray());
-            var blob = new Span<byte>(new byte[4 + bufferLength + 1]);
-            BinaryPrimitives.WriteInt32LittleEndian(blob, utf16 ? 0 - length : length);
-            if (utf16) Encoding.Unicode.GetBytes(span, blob.Slice(4));
-            else Encoding.UTF8.GetBytes(span, blob.Slice(4));
-            return blob;
+            SpanHelper.WriteLittleInt(buffer, utf16 ? 0 - length : length, ref cursor);
+            // TODO: SpanHelper.EnsureSpace(buffer, cursor + bufferLength);
+            if (utf16) Encoding.Unicode.GetBytes(span, buffer.Slice(cursor));
+            else Encoding.UTF8.GetBytes(span, buffer.Slice(cursor));
+            cursor += bufferLength;
         }
     }
 }

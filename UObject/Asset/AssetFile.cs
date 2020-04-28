@@ -8,11 +8,11 @@ namespace UObject.Asset
     [PublicAPI]
     public class AssetFile
     {
-        public AssetFile(Span<byte> uasset, Span<byte> uexp)
+        public AssetFile(Span<byte> uasset, Span<byte> uexp, int unrealVersion = 524)
         {
             var cursor = 0;
             Summary = new PackageFileSummary();
-            Summary.Deserialize(uasset, this, ref cursor);
+            Summary.Deserialize(uasset, this, unrealVersion, ref cursor);
         }
 
         public AssetFile() { }
