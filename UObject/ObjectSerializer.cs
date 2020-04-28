@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using UObject.ObjectModel;
 using UObject.Package;
 using UObject.Properties;
@@ -7,6 +8,7 @@ using UObject.Structs;
 
 namespace UObject
 {
+    [PublicAPI]
     public static class ObjectSerializer
     {
         public static Dictionary<string, Type> PropertyTypes { get; } = new Dictionary<string, Type>
@@ -32,16 +34,14 @@ namespace UObject
             { nameof(StringTable), typeof(StringTable) }
         };
 
-        public static (PackageFileSummary summary, List<UnrealObject> exports) Deserialize(Span<byte> uasset, Span<byte> uexp)
-        {
-        }
+        public static AssetFile Deserialize(Span<byte> uasset, Span<byte> uexp) => new AssetFile(uasset, uexp);
 
-        public static Span<byte> SerializeExports(ref PackageFileSummary summary, List<UnrealObject> uexp)
-        {
-        }
+        public static Span<byte> SerializeExports(ref PackageFileSummary summary, List<UnrealObject> uexp) => throw new NotImplementedException();
 
-        public static Span<byte> SerializeSummary(PackageFileSummary summary, List<UnrealObject> uasset)
-        {
-        }
+        public static Span<byte> SerializeSummary(PackageFileSummary summary, List<UnrealObject> uasset) => throw new NotImplementedException();
+
+        public static string DeserializeString(Span<byte> buffer) => throw new NotImplementedException();
+
+        public static Span<byte> SerializeString(Span<byte> buffer) => throw new NotImplementedException();
     }
 }
