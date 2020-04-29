@@ -15,12 +15,13 @@ namespace UObject2JSON
             {
                 var uasset = File.ReadAllBytes(arg + ".uasset");
                 var uexp = File.ReadAllBytes(arg + ".uexp");
-                var json = JsonSerializer.Serialize(ObjectSerializer.Deserialize(uasset, uexp), new JsonSerializerOptions
+                var json = JsonSerializer.Serialize(ObjectSerializer.Deserialize(uasset, uexp).ExportObjects, new JsonSerializerOptions
                 {
                     WriteIndented = true,
                     Converters =
                     {
-                        new GenericDictionaryConverterFactory()
+                        new GenericDictionaryConverterFactory(),
+                        new GenericListConverterFactory()
                     }
                 });
                 File.WriteAllText(arg + ".json", json);

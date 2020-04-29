@@ -10,4 +10,10 @@ namespace UObject.Properties
         void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor);
         void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor);
     }
+
+    [PublicAPI]
+    public interface IPropertyObject : ISerializableObject
+    {
+        void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor, bool ignoreTag);
+    }
 }

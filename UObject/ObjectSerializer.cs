@@ -17,7 +17,9 @@ namespace UObject
         public static Dictionary<string, Type> PropertyTypes { get; } = new Dictionary<string, Type>
         {
             { nameof(ObjectProperty), typeof(ObjectProperty) },
-            { nameof(StructProperty), typeof(StructProperty) }
+            { nameof(IntProperty), typeof(IntProperty) },
+            { nameof(StrProperty), typeof(StrProperty) },
+            { nameof(ArrayProperty), typeof(ArrayProperty) }
         };
 
         public static Dictionary<string, Type> StructTypes { get; } = new Dictionary<string, Type>
@@ -74,27 +76,27 @@ namespace UObject
             var start = cursor;
             var tag = DeserializeProperty<PropertyTag>(buffer, asset, ref cursor);
             var tmp = cursor;
-            try
-            {
-                cursor = start;
-                AbstractProperty instance;
-                if (!PropertyTypes.TryGetValue(tag.Type, out var propertyType))
-                {
-                    Logger.Warn("UObject", $"No Handler for property {tag.Name.Value} which has the type {tag.Type.Value}");
-                    instance = new AbstractProperty();
-                }
-                else
-                {
-                    if (!(Activator.CreateInstance(propertyType) is AbstractProperty instanceWrap)) throw new InvalidDataException();
-                    instance = instanceWrap;
-                }
+            cursor = start;
+            return DeserializeProperty(buffer, asset, tag, tag.Type, tmp, ref cursor, false);
+        }
 
+        public static AbstractProperty DeserializeProperty(Span<byte> buffer, AssetFile asset, PropertyTag tag, Name serializationType, int offset, ref int cursor, bool ignore)
+        {
+            if (serializationType == null) throw new InvalidDataException();
+            if (!PropertyTypes.TryGetValue(serializationType, out var propertyType))
+            {
+                Logger.Warn("UObject", $"No Handler for property {tag.Name.Value} which has the type {serializationType} at offset {offset:X} (size {tag.Size})");
+                if (ignore) return null;
+                var instance = new AbstractProperty();
                 instance.Deserialize(buffer, asset, ref cursor);
+                cursor = offset + tag.Size;
                 return instance;
             }
-            finally
+            else
             {
-                cursor = tmp + tag.Size;
+                if (!(Activator.CreateInstance(propertyType) is AbstractProperty instance)) throw new InvalidDataException();
+                instance.Deserialize(buffer, asset, ref cursor, ignore);
+                return instance;
             }
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json.Serialization;
 using DragonLib.IO;
 using JetBrains.Annotations;
 using UObject.Properties;
@@ -9,7 +10,10 @@ namespace UObject.Asset
     public class PackageIndex : ISerializableObject
     {
         public int Index { get; set; }
+
+        [JsonIgnore]
         public object ObjectResource { get; set; }
+
         public bool IsImport => Index < 0;
         public bool IsExport => Index > 0;
         public bool IsNull => Index == 0;

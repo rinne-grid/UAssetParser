@@ -10,7 +10,7 @@ namespace UObject.ObjectModel
     [PublicAPI]
     public class DataTable : UnrealObject
     {
-        public Dictionary<string, int> Table { get; set; } = new Dictionary<string, int>();
+        public Dictionary<string, UnrealObject> Table { get; set; } = new Dictionary<string, UnrealObject>();
 
         public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor)
         {
@@ -20,6 +20,8 @@ namespace UObject.ObjectModel
             for (var i = 0; i < count; ++i)
             {
                 var key = ObjectSerializer.DeserializeProperty<Name>(buffer, asset, ref cursor);
+                var data = ObjectSerializer.DeserializeProperty<UnrealObject>(buffer, asset, ref cursor);
+                Table[key] = data;
             }
         }
 
