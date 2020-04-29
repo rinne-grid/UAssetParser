@@ -60,6 +60,48 @@ namespace UObject
             return str;
         }
 
+        public static T DeserializeProperty<T>(Span<byte> buffer, AssetFile asset, ref int cursor) where T : IObjectProperty, new()
+        {
+            var instance = new T();
+            instance.Deserialize(buffer, asset, ref cursor);
+            return instance;
+        }
+
+        public static T[] DeserializeProperties<T>(Span<byte> buffer, AssetFile asset, int count, ref int cursor) where T : IObjectProperty, new()
+        {
+            var instances = AllocateProperties<T>(count);
+            DeserializeProperties(buffer, asset, instances, ref cursor);
+            return instances;
+        }
+
+        public static T[] AllocateProperties<T>(int count) where T : IObjectProperty, new()
+        {
+            var instances = new T[count];
+            for (var i = 0; i < count; ++i)
+            {
+                instances[i] = new T();
+            }
+            return instances;
+        }
+
+        public static void DeserializeProperties<T>(Span<byte> buffer, AssetFile asset, T[] instances, ref int cursor) where T : IObjectProperty, new()
+        {
+            foreach (var instance in instances)
+            {
+                instance.Deserialize(buffer, asset, ref cursor);
+            }
+        }
+
+        public static void SerializeProperty<T>(Span<byte> buffer, AssetFile asset, T instance, ref int cursor) where T : IObjectProperty, new()
+        {
+            instance.Serialize(buffer, asset, ref cursor);
+        }
+
+        public static void SerializeProperties<T>(Span<byte> buffer, AssetFile asset, T[] instances, ref int cursor) where T : IObjectProperty, new()
+        {
+            foreach (var instance in instances) instance.Serialize(buffer, asset, ref cursor);
+        }
+
         public static void SerializeString(Span<byte> buffer, string text, ref int cursor)
         {
             if (text == null) return;

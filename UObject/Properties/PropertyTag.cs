@@ -1,20 +1,19 @@
 ﻿using System;
 using JetBrains.Annotations;
-using UObject.Properties;
+using UObject.Asset;
 
-namespace UObject.Asset
+namespace UObject.Properties
 {
     [PublicAPI]
-    public class Name : IObjectProperty
+    public class PropertyTag : IObjectProperty
     {
+        public Name Name { get; set; }
+        public Name Type { get; set; }
+        public int Size { get; set; }
         public int Index { get; set; }
-        public int ExIndex { get; set; }
-        public string Value { get; set; }
 
         public void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor) => throw new NotImplementedException();
 
         public void Serialize(Span<byte> buffer, AssetFile asset, ref int cursor) => throw new NotImplementedException();
-
-        public static implicit operator string(Name name) => name.Value;
     }
 }

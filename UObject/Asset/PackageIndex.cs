@@ -1,4 +1,5 @@
 ﻿using System;
+using DragonLib.IO;
 using JetBrains.Annotations;
 using UObject.Properties;
 
@@ -27,8 +28,18 @@ namespace UObject.Asset
             _ => null
         };
 
-        public void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor) => throw new NotImplementedException();
+        public void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor)
+        {
+            Index = SpanHelper.ReadLittleInt(buffer, ref cursor);
+            var importIndex = 0 - Index - 1;
+            var exportIndex = Index - 1;
+            if (IsImport && asset.Imports.Length > importIndex) ObjectResource = asset.Imports[importIndex];
+            if (IsExport && asset.Exports.Length > exportIndex) ObjectResource = asset.Exports[exportIndex];
+        }
 
-        public void Serialize(Span<byte> buffer, AssetFile asset, ref int cursor) => throw new NotImplementedException();
+        public void Serialize(Span<byte> buffer, AssetFile asset, ref int cursor)
+        {
+            SpanHelper.WriteLittleInt(buffer, Index, ref cursor);
+        }
     }
 }

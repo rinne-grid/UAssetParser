@@ -58,12 +58,7 @@ namespace UObject.Asset
             if (LegacyFileVersion <= -2)
             {
                 var customVersionCount = SpanHelper.ReadLittleInt(buffer, ref cursor);
-                CustomVersion = new CustomVersion[customVersionCount];
-                for (var i = 0; i < customVersionCount; ++i)
-                {
-                    CustomVersion[i] = new CustomVersion();
-                    CustomVersion[i].Deserialize(buffer, asset, ref cursor);
-                }
+                CustomVersion = ObjectSerializer.DeserializeProperties<CustomVersion>(buffer, asset, customVersionCount, ref cursor);
             }
 
             TotalHeaderSize = SpanHelper.ReadLittleInt(buffer, ref cursor);
@@ -129,7 +124,7 @@ namespace UObject.Asset
             if (LegacyFileVersion <= -2)
             {
                 SpanHelper.WriteLittleInt(buffer, CustomVersion.Length, ref cursor);
-                foreach (var customVersion in CustomVersion) customVersion.Serialize(buffer, asset, ref cursor);
+                ObjectSerializer.SerializeProperties(buffer, asset, CustomVersion, ref cursor);
             }
 
             SpanHelper.WriteLittleInt(buffer, TotalHeaderSize, ref cursor);

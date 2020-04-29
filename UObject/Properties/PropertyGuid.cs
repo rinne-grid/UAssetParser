@@ -1,9 +1,9 @@
 ﻿using System;
 using DragonLib.IO;
 using JetBrains.Annotations;
-using UObject.Properties;
+using UObject.Asset;
 
-namespace UObject.Asset
+namespace UObject.Properties
 {
     [PublicAPI]
     public class PropertyGuid : IObjectProperty
