@@ -6,7 +6,7 @@ using UObject.Properties;
 namespace UObject.Asset
 {
     [PublicAPI]
-    public class PackageIndex : IObjectProperty
+    public class PackageIndex : ISerializableObject
     {
         public int Index { get; set; }
         public object ObjectResource { get; set; }
@@ -37,9 +37,6 @@ namespace UObject.Asset
             if (IsExport && asset.Exports.Length > exportIndex) ObjectResource = asset.Exports[exportIndex];
         }
 
-        public void Serialize(Span<byte> buffer, AssetFile asset, ref int cursor)
-        {
-            SpanHelper.WriteLittleInt(buffer, Index, ref cursor);
-        }
+        public void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor) => SpanHelper.WriteLittleInt(ref buffer, Index, ref cursor);
     }
 }

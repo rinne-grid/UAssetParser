@@ -2,15 +2,16 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using UObject.Asset;
-using UObject.Properties;
 
 namespace UObject.ObjectModel
 {
     [PublicAPI]
-    public class StringTable : Dictionary<string, object>, IObjectProperty
+    public class StringTable : UnrealObject
     {
-        public void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor) => throw new NotImplementedException();
+        public Dictionary<string, object> Entries { get; set; }
 
-        public void Serialize(Span<byte> buffer, AssetFile asset, ref int cursor) => throw new NotImplementedException();
+        public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor) => throw new NotImplementedException();
+
+        public override void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor) => throw new NotImplementedException();
     }
 }

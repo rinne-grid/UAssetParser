@@ -7,7 +7,7 @@ using UObject.Properties;
 namespace UObject.Asset
 {
     [PublicAPI]
-    public class ObjectExport : IObjectProperty
+    public class ObjectExport : ISerializableObject
     {
         public PackageIndex ClassIndex { get; set; }
         public PackageIndex SuperIndex { get; set; }
@@ -56,29 +56,29 @@ namespace UObject.Asset
             DynamicType = (DynamicType) SpanHelper.ReadLittleUInt(buffer, ref cursor);
         }
 
-        public void Serialize(Span<byte> buffer, AssetFile asset, ref int cursor)
+        public void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor)
         {
-            ClassIndex.Serialize(buffer, asset, ref cursor);
-            SuperIndex.Serialize(buffer, asset, ref cursor);
-            TemplateIndex.Serialize(buffer, asset, ref cursor);
-            OuterIndex.Serialize(buffer, asset, ref cursor);
-            ObjectName.Serialize(buffer, asset, ref cursor);
-            SpanHelper.WriteLittleUInt(buffer, (uint) ObjectFlags, ref cursor);
-            SpanHelper.WriteLittleLong(buffer, SerialSize, ref cursor);
-            SpanHelper.WriteLittleLong(buffer, SerialOffset, ref cursor);
-            SpanHelper.WriteLittleInt(buffer, ForcedExport ? 1 : 0, ref cursor);
-            SpanHelper.WriteLittleInt(buffer, NotForClient ? 1 : 0, ref cursor);
-            SpanHelper.WriteLittleInt(buffer, NotForServer ? 1 : 0, ref cursor);
-            SpanHelper.WriteStruct(buffer, PackageGuid, ref cursor);
-            SpanHelper.WriteLittleUInt(buffer, PackageFlags, ref cursor);
-            SpanHelper.WriteLittleInt(buffer, NotAlwaysLoadedForEditorGame ? 1 : 0, ref cursor);
-            SpanHelper.WriteLittleInt(buffer, IsAsset ? 1 : 0, ref cursor);
-            SpanHelper.WriteLittleInt(buffer, FirstExportDependency, ref cursor);
-            SpanHelper.WriteLittleInt(buffer, SerializationBeforeSerializationDependencies ? 1 : 0, ref cursor);
-            SpanHelper.WriteLittleInt(buffer, CreateBeforeSerializationDependencies ? 1 : 0, ref cursor);
-            SpanHelper.WriteLittleInt(buffer, SerializationBeforeCreateDependencies ? 1 : 0, ref cursor);
-            SpanHelper.WriteLittleInt(buffer, CreateBeforeCreateDependencies ? 1 : 0, ref cursor);
-            SpanHelper.WriteLittleUInt(buffer, (uint) DynamicType, ref cursor);
+            ClassIndex.Serialize(ref buffer, asset, ref cursor);
+            SuperIndex.Serialize(ref buffer, asset, ref cursor);
+            TemplateIndex.Serialize(ref buffer, asset, ref cursor);
+            OuterIndex.Serialize(ref buffer, asset, ref cursor);
+            ObjectName.Serialize(ref buffer, asset, ref cursor);
+            SpanHelper.WriteLittleUInt(ref buffer, (uint) ObjectFlags, ref cursor);
+            SpanHelper.WriteLittleLong(ref buffer, SerialSize, ref cursor);
+            SpanHelper.WriteLittleLong(ref buffer, SerialOffset, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, ForcedExport ? 1 : 0, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, NotForClient ? 1 : 0, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, NotForServer ? 1 : 0, ref cursor);
+            SpanHelper.WriteStruct(ref buffer, PackageGuid, ref cursor);
+            SpanHelper.WriteLittleUInt(ref buffer, PackageFlags, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, NotAlwaysLoadedForEditorGame ? 1 : 0, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, IsAsset ? 1 : 0, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, FirstExportDependency, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, SerializationBeforeSerializationDependencies ? 1 : 0, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, CreateBeforeSerializationDependencies ? 1 : 0, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, SerializationBeforeCreateDependencies ? 1 : 0, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, CreateBeforeCreateDependencies ? 1 : 0, ref cursor);
+            SpanHelper.WriteLittleUInt(ref buffer, (uint) DynamicType, ref cursor);
         }
     }
 }

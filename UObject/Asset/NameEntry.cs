@@ -6,7 +6,7 @@ using UObject.Properties;
 namespace UObject.Asset
 {
     [PublicAPI]
-    public class NameEntry : IObjectProperty
+    public class NameEntry : ISerializableObject
     {
         public string Name { get; set; }
         public ushort NonCasePreservingHash { get; set; }
@@ -19,11 +19,11 @@ namespace UObject.Asset
             CasePreservingHash = SpanHelper.ReadLittleUShort(buffer, ref cursor);
         }
 
-        public void Serialize(Span<byte> buffer, AssetFile asset, ref int cursor)
+        public void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor)
         {
-            ObjectSerializer.SerializeString(buffer, Name, ref cursor);
-            SpanHelper.WriteLittleUShort(buffer, NonCasePreservingHash, ref cursor);
-            SpanHelper.WriteLittleUShort(buffer, CasePreservingHash, ref cursor);
+            ObjectSerializer.SerializeString(ref buffer, Name, ref cursor);
+            SpanHelper.WriteLittleUShort(ref buffer, NonCasePreservingHash, ref cursor);
+            SpanHelper.WriteLittleUShort(ref buffer, CasePreservingHash, ref cursor);
         }
     }
 }

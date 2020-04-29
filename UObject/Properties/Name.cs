@@ -6,7 +6,7 @@ using UObject.Asset;
 namespace UObject.Properties
 {
     [PublicAPI]
-    public class Name : IObjectProperty
+    public class Name : ISerializableObject
     {
         public int Index { get; set; }
         public int ExIndex { get; set; }
@@ -20,10 +20,10 @@ namespace UObject.Properties
             Value = asset.Names[Index].Name;
         }
 
-        public void Serialize(Span<byte> buffer, AssetFile asset, ref int cursor)
+        public void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor)
         {
-            SpanHelper.WriteLittleInt(buffer, Index, ref cursor);
-            SpanHelper.WriteLittleInt(buffer, ExIndex, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, Index, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, ExIndex, ref cursor);
             // TODO: Recalculate Index.
         }
 

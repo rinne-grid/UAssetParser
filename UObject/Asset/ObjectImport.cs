@@ -5,7 +5,7 @@ using UObject.Properties;
 namespace UObject.Asset
 {
     [PublicAPI]
-    public class ObjectImport : IObjectProperty
+    public class ObjectImport : ISerializableObject
     {
         public Name ClassPackage { get; set; }
         public Name ClassName { get; set; }
@@ -20,12 +20,12 @@ namespace UObject.Asset
             ObjectName = ObjectSerializer.DeserializeProperty<Name>(buffer, asset, ref cursor);
         }
 
-        public void Serialize(Span<byte> buffer, AssetFile asset, ref int cursor)
+        public void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor)
         {
-            ClassPackage.Serialize(buffer, asset, ref cursor);
-            ClassName.Serialize(buffer, asset, ref cursor);
-            PackageRef.Serialize(buffer, asset, ref cursor);
-            ObjectName.Serialize(buffer, asset, ref cursor);
+            ClassPackage.Serialize(ref buffer, asset, ref cursor);
+            ClassName.Serialize(ref buffer, asset, ref cursor);
+            PackageRef.Serialize(ref buffer, asset, ref cursor);
+            ObjectName.Serialize(ref buffer, asset, ref cursor);
         }
     }
 }

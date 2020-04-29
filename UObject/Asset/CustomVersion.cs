@@ -6,7 +6,7 @@ using UObject.Properties;
 namespace UObject.Asset
 {
     [PublicAPI]
-    public class CustomVersion : IObjectProperty
+    public class CustomVersion : ISerializableObject
     {
         public Guid Key { get; set; }
         public int Version { get; set; }
@@ -18,11 +18,11 @@ namespace UObject.Asset
             Version = SpanHelper.ReadLittleInt(buffer, ref cursor);
         }
 
-        public void Serialize(Span<byte> buffer, AssetFile asset, ref int cursor)
+        public void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor)
         {
-            if (asset.Summary.LegacyFileVersion < -2 && asset.Summary.LegacyFileVersion >= -5) SpanHelper.WriteStruct(buffer, Key, ref cursor);
+            if (asset.Summary.LegacyFileVersion < -2 && asset.Summary.LegacyFileVersion >= -5) SpanHelper.WriteStruct(ref buffer, Key, ref cursor);
 
-            SpanHelper.WriteLittleInt(buffer, Version, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, Version, ref cursor);
         }
     }
 }

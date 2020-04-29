@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using DragonLib.IO;
 using JetBrains.Annotations;
@@ -15,6 +16,7 @@ namespace UObject
     {
         public static Dictionary<string, Type> PropertyTypes { get; } = new Dictionary<string, Type>
         {
+            { nameof(ObjectProperty), typeof(ObjectProperty) },
             { nameof(StructProperty), typeof(StructProperty) }
         };
 
@@ -30,7 +32,7 @@ namespace UObject
             { nameof(Vector2D), typeof(Vector2D) }
         };
 
-        public static Dictionary<string, Type> ExportTypes { get; } = new Dictionary<string, Type>
+        public static Dictionary<string, Type> ClassTypes { get; } = new Dictionary<string, Type>
         {
             { nameof(DataTable), typeof(DataTable) },
             { nameof(StringTable), typeof(StringTable) }
@@ -60,54 +62,74 @@ namespace UObject
             return str;
         }
 
-        public static T DeserializeProperty<T>(Span<byte> buffer, AssetFile asset, ref int cursor) where T : IObjectProperty, new()
+        public static T DeserializeProperty<T>(Span<byte> buffer, AssetFile asset, ref int cursor) where T : ISerializableObject, new()
         {
             var instance = new T();
             instance.Deserialize(buffer, asset, ref cursor);
             return instance;
         }
 
-        public static T[] DeserializeProperties<T>(Span<byte> buffer, AssetFile asset, int count, ref int cursor) where T : IObjectProperty, new()
+        public static AbstractProperty DeserializeProperty(Span<byte> buffer, AssetFile asset, ref int cursor)
+        {
+            var start = cursor;
+            var tag = DeserializeProperty<PropertyTag>(buffer, asset, ref cursor);
+            var tmp = cursor;
+            try
+            {
+                cursor = start;
+                AbstractProperty instance;
+                if (!PropertyTypes.TryGetValue(tag.Type, out var propertyType))
+                {
+                    Logger.Warn("UObject", $"No Handler for property {tag.Name.Value} which has the type {tag.Type.Value}");
+                    instance = new AbstractProperty();
+                }
+                else
+                {
+                    if (!(Activator.CreateInstance(propertyType) is AbstractProperty instanceWrap)) throw new InvalidDataException();
+                    instance = instanceWrap;
+                }
+
+                instance.Deserialize(buffer, asset, ref cursor);
+                return instance;
+            }
+            finally
+            {
+                cursor = tmp + tag.Size;
+            }
+        }
+
+        public static T[] DeserializeProperties<T>(Span<byte> buffer, AssetFile asset, int count, ref int cursor) where T : ISerializableObject, new()
         {
             var instances = AllocateProperties<T>(count);
             DeserializeProperties(buffer, asset, instances, ref cursor);
             return instances;
         }
 
-        public static T[] AllocateProperties<T>(int count) where T : IObjectProperty, new()
+        public static T[] AllocateProperties<T>(int count) where T : ISerializableObject, new()
         {
             var instances = new T[count];
-            for (var i = 0; i < count; ++i)
-            {
-                instances[i] = new T();
-            }
+            for (var i = 0; i < count; ++i) instances[i] = new T();
             return instances;
         }
 
-        public static void DeserializeProperties<T>(Span<byte> buffer, AssetFile asset, T[] instances, ref int cursor) where T : IObjectProperty, new()
+        public static void DeserializeProperties<T>(Span<byte> buffer, AssetFile asset, T[] instances, ref int cursor) where T : ISerializableObject, new()
         {
-            foreach (var instance in instances)
-            {
-                instance.Deserialize(buffer, asset, ref cursor);
-            }
+            foreach (var instance in instances) instance.Deserialize(buffer, asset, ref cursor);
         }
 
-        public static void SerializeProperty<T>(Span<byte> buffer, AssetFile asset, T instance, ref int cursor) where T : IObjectProperty, new()
+        public static void SerializeProperty<T>(ref Memory<byte> buffer, AssetFile asset, T instance, ref int cursor) where T : ISerializableObject, new() => instance.Serialize(ref buffer, asset, ref cursor);
+
+        public static void SerializeProperties<T>(ref Memory<byte> buffer, AssetFile asset, T[] instances, ref int cursor) where T : ISerializableObject, new()
         {
-            instance.Serialize(buffer, asset, ref cursor);
+            foreach (var instance in instances) instance.Serialize(ref buffer, asset, ref cursor);
         }
 
-        public static void SerializeProperties<T>(Span<byte> buffer, AssetFile asset, T[] instances, ref int cursor) where T : IObjectProperty, new()
-        {
-            foreach (var instance in instances) instance.Serialize(buffer, asset, ref cursor);
-        }
-
-        public static void SerializeString(Span<byte> buffer, string text, ref int cursor)
+        public static void SerializeString(ref Memory<byte> buffer, string text, ref int cursor)
         {
             if (text == null) return;
             if (text == string.Empty)
             {
-                SpanHelper.WriteLittleInt(buffer, 1, ref cursor);
+                SpanHelper.WriteLittleInt(ref buffer, 1, ref cursor);
                 cursor += 1;
             }
 
@@ -121,11 +143,24 @@ namespace UObject
             }
 
             var span = new Span<char>(text.ToCharArray());
-            SpanHelper.WriteLittleInt(buffer, utf16 ? 0 - length : length, ref cursor);
-            // TODO: SpanHelper.EnsureSpace(buffer, cursor + bufferLength);
-            if (utf16) Encoding.Unicode.GetBytes(span, buffer.Slice(cursor));
-            else Encoding.UTF8.GetBytes(span, buffer.Slice(cursor));
+            SpanHelper.WriteLittleInt(ref buffer, utf16 ? 0 - length : length, ref cursor);
+            SpanHelper.EnsureSpace(ref buffer, cursor + bufferLength);
+            if (utf16) Encoding.Unicode.GetBytes(span, buffer.Slice(cursor).Span);
+            else Encoding.UTF8.GetBytes(span, buffer.Slice(cursor).Span);
             cursor += bufferLength;
+        }
+
+        public static ISerializableObject DeserializeObject(AssetFile asset, ObjectExport export, Span<byte> uasset, Span<byte> uexp)
+        {
+            var blob = uexp.Length > 0 ? uexp.Slice((int) (export.SerialOffset - asset.Summary.TotalHeaderSize), (int) export.SerialSize) : uasset.Slice((int) export.SerialOffset, (int) export.SerialSize);
+
+            if (!ClassTypes.TryGetValue(export.ClassIndex.Name, out var classType)) throw new NotImplementedException(export.ClassIndex.Name);
+
+            if (!(Activator.CreateInstance(classType) is ISerializableObject instance)) throw new NotImplementedException(export.ClassIndex.Name);
+
+            var cursor = 0;
+            instance.Deserialize(blob, asset, ref cursor);
+            return instance;
         }
     }
 }

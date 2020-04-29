@@ -25,6 +25,8 @@ namespace UObject.Asset
             ObjectSerializer.DeserializeProperties(uasset, this, Exports, ref cursor);
             cursor = Summary.PreloadDependencyOffset;
             PreloadDependencies = SpanHelper.ReadStructArray<PreloadDependencyIndex>(uasset, Summary.PreloadDependencyCount, ref cursor);
+
+            foreach (var export in Exports) ExportObjects[export.ObjectName] = ObjectSerializer.DeserializeObject(this, export, uasset, uexp);
         }
 
         public AssetFile() { }
@@ -35,6 +37,6 @@ namespace UObject.Asset
         public ObjectExport[] Exports { get; set; }
         public PreloadDependencyIndex[] PreloadDependencies { get; set; }
 
-        public Dictionary<string, IObjectProperty> ExportObjects { get; set; } = new Dictionary<string, IObjectProperty>();
+        public Dictionary<string, ISerializableObject> ExportObjects { get; set; } = new Dictionary<string, ISerializableObject>();
     }
 }

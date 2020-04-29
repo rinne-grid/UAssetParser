@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using DragonLib.IO;
 using JetBrains.Annotations;
 using UObject.Asset;
 using UObject.Properties;
@@ -7,10 +8,21 @@ using UObject.Properties;
 namespace UObject.ObjectModel
 {
     [PublicAPI]
-    public class DataTable : Dictionary<string, object>, IObjectProperty
+    public class DataTable : UnrealObject
     {
-        public void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor) => throw new NotImplementedException();
+        public Dictionary<string, int> Table { get; set; } = new Dictionary<string, int>();
 
-        public void Serialize(Span<byte> buffer, AssetFile asset, ref int cursor) => throw new NotImplementedException();
+        public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor)
+        {
+            base.Deserialize(buffer, asset, ref cursor);
+            cursor += 4;
+            var count = SpanHelper.ReadLittleInt(buffer, ref cursor);
+            for (var i = 0; i < count; ++i)
+            {
+                var key = ObjectSerializer.DeserializeProperty<Name>(buffer, asset, ref cursor);
+            }
+        }
+
+        public override void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor) => throw new NotImplementedException();
     }
 }

@@ -114,69 +114,69 @@ namespace UObject.Asset
             }
         }
 
-        public void Serialize(Span<byte> buffer, AssetFile asset, ref int cursor)
+        public void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor)
         {
-            SpanHelper.WriteLittleUInt(buffer, Tag, ref cursor);
-            SpanHelper.WriteLittleInt(buffer, LegacyFileVersion, ref cursor);
-            if (LegacyFileVersion != -4) SpanHelper.WriteLittleInt(buffer, LegacyUE3Version, ref cursor);
-            SpanHelper.WriteLittleInt(buffer, FileVersionUE4, ref cursor);
-            SpanHelper.WriteLittleInt(buffer, FileVersionLicenseeUE4, ref cursor);
+            SpanHelper.WriteLittleUInt(ref buffer, Tag, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, LegacyFileVersion, ref cursor);
+            if (LegacyFileVersion != -4) SpanHelper.WriteLittleInt(ref buffer, LegacyUE3Version, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, FileVersionUE4, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, FileVersionLicenseeUE4, ref cursor);
             if (LegacyFileVersion <= -2)
             {
-                SpanHelper.WriteLittleInt(buffer, CustomVersion.Length, ref cursor);
-                ObjectSerializer.SerializeProperties(buffer, asset, CustomVersion, ref cursor);
+                SpanHelper.WriteLittleInt(ref buffer, CustomVersion.Length, ref cursor);
+                ObjectSerializer.SerializeProperties(ref buffer, asset, CustomVersion, ref cursor);
             }
 
-            SpanHelper.WriteLittleInt(buffer, TotalHeaderSize, ref cursor);
-            ObjectSerializer.SerializeString(buffer, FolderName, ref cursor);
-            SpanHelper.WriteLittleUInt(buffer, PackageFlags, ref cursor);
-            SpanHelper.WriteLittleInt(buffer, NameCount, ref cursor);
-            SpanHelper.WriteLittleInt(buffer, NameOffset, ref cursor);
-            SpanHelper.WriteLittleInt(buffer, GatherableNameCount, ref cursor);
-            SpanHelper.WriteLittleInt(buffer, GatherableNameOffset, ref cursor);
-            SpanHelper.WriteLittleInt(buffer, ExportCount, ref cursor);
-            SpanHelper.WriteLittleInt(buffer, ExportOffset, ref cursor);
-            SpanHelper.WriteLittleInt(buffer, ImportCount, ref cursor);
-            SpanHelper.WriteLittleInt(buffer, ImportOffset, ref cursor);
-            SpanHelper.WriteLittleInt(buffer, DependsOffset, ref cursor);
-            SpanHelper.WriteLittleInt(buffer, SoftPackageReferencesCount, ref cursor);
-            SpanHelper.WriteLittleInt(buffer, SoftPackageReferencesOffset, ref cursor);
-            SpanHelper.WriteLittleInt(buffer, SearchableNamesOffset, ref cursor);
-            SpanHelper.WriteLittleInt(buffer, ThumbnailTableOffset, ref cursor);
-            SpanHelper.WriteStruct(buffer, Guid, ref cursor);
-            SpanHelper.WriteLittleInt(buffer, Generations.Length, ref cursor);
-            SpanHelper.WriteStructArray(buffer, Generations, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, TotalHeaderSize, ref cursor);
+            ObjectSerializer.SerializeString(ref buffer, FolderName, ref cursor);
+            SpanHelper.WriteLittleUInt(ref buffer, PackageFlags, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, NameCount, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, NameOffset, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, GatherableNameCount, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, GatherableNameOffset, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, ExportCount, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, ExportOffset, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, ImportCount, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, ImportOffset, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, DependsOffset, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, SoftPackageReferencesCount, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, SoftPackageReferencesOffset, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, SearchableNamesOffset, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, ThumbnailTableOffset, ref cursor);
+            SpanHelper.WriteStruct(ref buffer, Guid, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, Generations.Length, ref cursor);
+            SpanHelper.WriteStructArray(ref buffer, Generations, ref cursor);
             if (FileVersionUE4 >= 337)
-                SpanHelper.WriteStruct(buffer, SavedByEngineVersion, ref cursor);
+                SpanHelper.WriteStruct(ref buffer, SavedByEngineVersion, ref cursor);
             else
-                SpanHelper.WriteLittleInt(buffer, EngineChangeList, ref cursor);
+                SpanHelper.WriteLittleInt(ref buffer, EngineChangeList, ref cursor);
             if (FileVersionUE4 >= 448)
-                SpanHelper.WriteStruct(buffer, CompatibleWithEngineVersion, ref cursor);
-            SpanHelper.WriteLittleInt(buffer, CompressedChunks.Length, ref cursor);
-            SpanHelper.WriteStructArray(buffer, CompressedChunks, ref cursor);
-            SpanHelper.WriteLittleUInt(buffer, PackageSource, ref cursor);
-            SpanHelper.WriteLittleInt(buffer, AdditionalPackagesToCook.Length, ref cursor);
-            foreach (var additionalPackage in AdditionalPackagesToCook) ObjectSerializer.SerializeString(buffer, additionalPackage, ref cursor);
-            if (LegacyFileVersion > -7) SpanHelper.WriteLittleInt(buffer, NumTextureAllocations, ref cursor);
+                SpanHelper.WriteStruct(ref buffer, CompatibleWithEngineVersion, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, CompressedChunks.Length, ref cursor);
+            SpanHelper.WriteStructArray(ref buffer, CompressedChunks, ref cursor);
+            SpanHelper.WriteLittleUInt(ref buffer, PackageSource, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, AdditionalPackagesToCook.Length, ref cursor);
+            foreach (var additionalPackage in AdditionalPackagesToCook) ObjectSerializer.SerializeString(ref buffer, additionalPackage, ref cursor);
+            if (LegacyFileVersion > -7) SpanHelper.WriteLittleInt(ref buffer, NumTextureAllocations, ref cursor);
 
-            SpanHelper.WriteLittleInt(buffer, AssetRegistryDataOffset, ref cursor);
-            SpanHelper.WriteLittleLong(buffer, BulkDataStartOffset, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, AssetRegistryDataOffset, ref cursor);
+            SpanHelper.WriteLittleLong(ref buffer, BulkDataStartOffset, ref cursor);
             if (FileVersionUE4 >= 224)
-                SpanHelper.WriteLittleInt(buffer, WorldTileInfoDataOffset, ref cursor);
+                SpanHelper.WriteLittleInt(ref buffer, WorldTileInfoDataOffset, ref cursor);
             if (FileVersionUE4 >= 327)
             {
-                SpanHelper.WriteLittleInt(buffer, ChunkIDs.Length, ref cursor);
-                SpanHelper.WriteStructArray(buffer, ChunkIDs, ref cursor);
+                SpanHelper.WriteLittleInt(ref buffer, ChunkIDs.Length, ref cursor);
+                SpanHelper.WriteStructArray(ref buffer, ChunkIDs, ref cursor);
             }
             else if (FileVersionUE4 >= 279)
             {
-                SpanHelper.WriteLittleInt(buffer, ChunkIDs.FirstOrDefault(), ref cursor);
+                SpanHelper.WriteLittleInt(ref buffer, ChunkIDs.FirstOrDefault(), ref cursor);
             }
 
             if (FileVersionUE4 >= 511)
             {
-                SpanHelper.WriteLittleInt(buffer, PreloadDependencyCount, ref cursor);
-                SpanHelper.WriteLittleInt(buffer, PreloadDependencyOffset, ref cursor);
+                SpanHelper.WriteLittleInt(ref buffer, PreloadDependencyCount, ref cursor);
+                SpanHelper.WriteLittleInt(ref buffer, PreloadDependencyOffset, ref cursor);
             }
         }
     }

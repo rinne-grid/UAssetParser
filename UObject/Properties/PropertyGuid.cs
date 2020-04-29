@@ -6,7 +6,7 @@ using UObject.Asset;
 namespace UObject.Properties
 {
     [PublicAPI]
-    public class PropertyGuid : IObjectProperty
+    public class PropertyGuid : ISerializableObject
     {
         public bool HasGuid => Guid != Guid.Empty;
 
@@ -18,10 +18,10 @@ namespace UObject.Properties
             if (hasGuid) Guid = SpanHelper.ReadStruct<Guid>(buffer, ref cursor);
         }
 
-        public void Serialize(Span<byte> buffer, AssetFile asset, ref int cursor)
+        public void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor)
         {
-            SpanHelper.WriteByte(buffer, (byte) (HasGuid ? 1 : 0), ref cursor);
-            if (HasGuid) SpanHelper.WriteStruct(buffer, Guid, ref cursor);
+            SpanHelper.WriteByte(ref buffer, (byte) (HasGuid ? 1 : 0), ref cursor);
+            if (HasGuid) SpanHelper.WriteStruct(ref buffer, Guid, ref cursor);
         }
     }
 }
