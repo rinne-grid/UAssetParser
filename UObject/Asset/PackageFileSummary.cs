@@ -46,14 +46,14 @@ namespace UObject.Asset
         public int PreloadDependencyCount { get; set; }
         public int PreloadDependencyOffset { get; set; }
 
-        public void Deserialize(Span<byte> buffer, AssetFile asset, int fileVersionOverride, ref int cursor)
+        public void Deserialize(Span<byte> buffer, AssetFile asset, AssetFileOptions options, ref int cursor)
         {
             Tag = SpanHelper.ReadLittleUInt(buffer, ref cursor);
             Logger.Assert(Tag == 0x9E2A83C1, "Tag == 0x9E2A83C1", "Tag does not match expected asset magic tag", $"Got {Tag:X8} instead!");
             LegacyFileVersion = SpanHelper.ReadLittleInt(buffer, ref cursor);
             if (LegacyFileVersion != -4) LegacyUE3Version = SpanHelper.ReadLittleInt(buffer, ref cursor);
             FileVersionUE4 = SpanHelper.ReadLittleInt(buffer, ref cursor);
-            if (FileVersionUE4 < 214) FileVersionUE4 = fileVersionOverride;
+            if (FileVersionUE4 < 214) FileVersionUE4 = options.UnrealVersion;
             FileVersionLicenseeUE4 = SpanHelper.ReadLittleInt(buffer, ref cursor);
             if (LegacyFileVersion <= -2)
             {

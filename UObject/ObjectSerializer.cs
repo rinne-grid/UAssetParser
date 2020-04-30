@@ -36,7 +36,7 @@ namespace UObject
             { nameof(StringTable), typeof(StringTable) }
         };
 
-        public static AssetFile Deserialize(Span<byte> uasset, Span<byte> uexp) => new AssetFile(uasset, uexp);
+        public static AssetFile Deserialize(Span<byte> uasset, Span<byte> uexp, AssetFileOptions options) => new AssetFile(uasset, uexp, options);
 
         public static Span<byte> SerializeExports(ref PackageFileSummary summary, List<UnrealObject> uexp) => throw new NotImplementedException();
 

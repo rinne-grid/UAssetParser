@@ -6,6 +6,7 @@ using DragonLib.IO;
 using DragonLib.JSON;
 using JetBrains.Annotations;
 using UObject;
+using UObject.Asset;
 
 namespace UObject2JSON
 {
@@ -32,7 +33,7 @@ namespace UObject2JSON
                 var uasset = File.ReadAllBytes(arg + ".uasset");
                 var uexp = File.ReadAllBytes(arg + ".uexp");
                 Logger.Info("UAsset", arg);
-                var json = JsonSerializer.Serialize(ObjectSerializer.Deserialize(uasset, uexp).ExportObjects, new JsonSerializerOptions
+                var json = JsonSerializer.Serialize(ObjectSerializer.Deserialize(uasset, uexp, new AssetFileOptions { UnrealVersion = flags.UnrealVersion, Workaround = flags.Workaround }).ExportObjects, new JsonSerializerOptions
                 {
                     WriteIndented = true,
                     Converters =
