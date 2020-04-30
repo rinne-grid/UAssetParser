@@ -7,12 +7,12 @@ namespace UObject.Properties
     [PublicAPI]
     public class ObjectProperty : AbstractGuidProperty
     {
-        public PackageIndex PackageIndex { get; set; }
+        public PackageIndex PackageIndex { get; set; } = new PackageIndex();
 
         public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor, bool ignore)
         {
             base.Deserialize(buffer, asset, ref cursor, ignore);
-            PackageIndex = ObjectSerializer.DeserializeProperty<PackageIndex>(buffer, asset, ref cursor);
+            PackageIndex.Deserialize(buffer, asset, ref cursor);
         }
 
         public override void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor)

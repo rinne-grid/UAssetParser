@@ -3,7 +3,7 @@ using DragonLib.IO;
 using JetBrains.Annotations;
 using UObject.Asset;
 
-namespace UObject.Properties
+namespace UObject.Generics
 {
     [PublicAPI]
     public class PropertyGuid : ISerializableObject

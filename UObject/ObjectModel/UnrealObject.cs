@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using UObject.Asset;
-using UObject.Properties;
+using UObject.Generics;
 
 namespace UObject.ObjectModel
 {
@@ -16,12 +16,13 @@ namespace UObject.ObjectModel
             while (true)
             {
                 var tmp = cursor;
-                var key = ObjectSerializer.DeserializeProperty<Name>(buffer, asset, ref cursor);
+                var key = new Name();
+                key.Deserialize(buffer, asset, ref cursor);
                 if (key == "None") break;
                 // rollback
                 cursor = tmp;
                 var property = ObjectSerializer.DeserializeProperty(buffer, asset, ref cursor);
-                Entries[property.Tag.Name] = property;
+                Entries[property.Tag?.Name ?? $"{cursor:X}"] = property;
             }
         }
 

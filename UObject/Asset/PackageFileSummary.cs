@@ -13,9 +13,9 @@ namespace UObject.Asset
         public int LegacyUE3Version { get; set; }
         public int FileVersionUE4 { get; set; }
         public int FileVersionLicenseeUE4 { get; set; }
-        public CustomVersion[] CustomVersion { get; set; }
+        public CustomVersion[] CustomVersion { get; set; } = new CustomVersion[0];
         public int TotalHeaderSize { get; set; }
-        public string FolderName { get; set; }
+        public string FolderName { get; set; } = "None";
         public uint PackageFlags { get; set; }
         public int NameCount { get; set; }
         public int NameOffset { get; set; }
@@ -31,18 +31,18 @@ namespace UObject.Asset
         public int SearchableNamesOffset { get; set; }
         public int ThumbnailTableOffset { get; set; }
         public Guid Guid { get; set; }
-        public GenerationInfo[] Generations { get; set; }
+        public GenerationInfo[] Generations { get; set; } = new GenerationInfo[0];
         public EngineVersion SavedByEngineVersion { get; set; }
         public int EngineChangeList { get; set; }
         public EngineVersion CompatibleWithEngineVersion { get; set; }
-        public CompressedChunk[] CompressedChunks { get; set; }
+        public CompressedChunk[] CompressedChunks { get; set; } = new CompressedChunk[0];
         public uint PackageSource { get; set; }
-        public string[] AdditionalPackagesToCook { get; set; }
+        public string[] AdditionalPackagesToCook { get; set; } = new string[0];
         public int NumTextureAllocations { get; set; }
         public int AssetRegistryDataOffset { get; set; }
         public long BulkDataStartOffset { get; set; }
         public int WorldTileInfoDataOffset { get; set; }
-        public int[] ChunkIDs { get; set; }
+        public int[] ChunkIDs { get; set; } = new int[0];
         public int PreloadDependencyCount { get; set; }
         public int PreloadDependencyOffset { get; set; }
 

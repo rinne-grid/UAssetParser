@@ -3,20 +3,20 @@ using DragonLib.IO;
 using JetBrains.Annotations;
 using UObject.Asset;
 
-namespace UObject.Properties
+namespace UObject.Generics
 {
     [PublicAPI]
     public class PropertyTag : ISerializableObject
     {
-        public Name Name { get; set; }
-        public Name Type { get; set; }
+        public Name Name { get; set; } = new Name();
+        public Name Type { get; set; } = new Name();
         public int Size { get; set; }
         public int Index { get; set; }
 
         public virtual void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor)
         {
-            Name = ObjectSerializer.DeserializeProperty<Name>(buffer, asset, ref cursor);
-            Type = ObjectSerializer.DeserializeProperty<Name>(buffer, asset, ref cursor);
+            Name.Deserialize(buffer, asset, ref cursor);
+            Type.Deserialize(buffer, asset, ref cursor);
             Size = SpanHelper.ReadLittleInt(buffer, ref cursor);
             Index = SpanHelper.ReadLittleInt(buffer, ref cursor);
         }

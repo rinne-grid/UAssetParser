@@ -2,7 +2,7 @@
 using System.Text.Json.Serialization;
 using DragonLib.IO;
 using JetBrains.Annotations;
-using UObject.Properties;
+using UObject.Generics;
 
 namespace UObject.Asset
 {
@@ -12,20 +12,20 @@ namespace UObject.Asset
         public int Index { get; set; }
 
         [JsonIgnore]
-        public object ObjectResource { get; set; }
+        public object? ObjectResource { get; set; }
 
         public bool IsImport => Index < 0;
         public bool IsExport => Index > 0;
         public bool IsNull => Index == 0;
 
-        public string Name => ObjectResource switch
+        public string? Name => ObjectResource switch
         {
             ObjectExport export => export.ObjectName,
             ObjectImport import => import.ObjectName,
             _ => null
         };
 
-        public string FullName => ObjectResource switch
+        public string? FullName => ObjectResource switch
         {
             ObjectExport export => export.ObjectName,
             ObjectImport import => import.PackageRef.IsNull ? import.ObjectName : import.PackageRef.Name,

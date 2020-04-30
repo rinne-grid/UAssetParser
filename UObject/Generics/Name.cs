@@ -1,16 +1,21 @@
 ﻿using System;
+using System.Text.Json.Serialization;
 using DragonLib.IO;
 using JetBrains.Annotations;
 using UObject.Asset;
 
-namespace UObject.Properties
+namespace UObject.Generics
 {
     [PublicAPI]
     public class Name : ISerializableObject
     {
+        [JsonIgnore]
         public int Index { get; set; }
+
+        [JsonIgnore]
         public int ExIndex { get; set; }
-        public string Value { get; set; }
+
+        public string Value { get; set; } = "None";
 
         public void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor)
         {
@@ -27,6 +32,6 @@ namespace UObject.Properties
             // TODO: Recalculate Index.
         }
 
-        public static implicit operator string(Name name) => name?.Value;
+        public static implicit operator string(Name? name) => name?.Value ?? "None";
     }
 }

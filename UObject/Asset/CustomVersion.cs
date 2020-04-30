@@ -1,7 +1,7 @@
 ﻿using System;
 using DragonLib.IO;
 using JetBrains.Annotations;
-using UObject.Properties;
+using UObject.Generics;
 
 namespace UObject.Asset
 {

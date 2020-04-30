@@ -2,6 +2,16 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
+        <RuntimeIdentifiers>win10-x64;osx-x64;linux-x64</RuntimeIdentifiers>
+        <NoWarn>1701;1702;NU1701</NoWarn>
+        <Nullable>enable</Nullable>
+        <LangVersion>8.0</LangVersion>
+        <PackageId>UAssetParser</PackageId>
+        <Version>1.0.0</Version>
+        <Authors>yretenai</Authors>
+        <PackageDescription>Parses UObject asset files, mainly for data tables.</PackageDescription>
+        <RepositoryUrl>https://github.com/healingbrew/UAssetParser</RepositoryUrl>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>

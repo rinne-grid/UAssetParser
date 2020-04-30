@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using DragonLib.IO;
 using JetBrains.Annotations;
 using UObject.Asset;
-using UObject.Properties;
+using UObject.Generics;
 
 namespace UObject.ObjectModel
 {
@@ -19,8 +19,10 @@ namespace UObject.ObjectModel
             var count = SpanHelper.ReadLittleInt(buffer, ref cursor);
             for (var i = 0; i < count; ++i)
             {
-                var key = ObjectSerializer.DeserializeProperty<Name>(buffer, asset, ref cursor);
-                var data = ObjectSerializer.DeserializeProperty<UnrealObject>(buffer, asset, ref cursor);
+                var key = new Name();
+                key.Deserialize(buffer, asset, ref cursor);
+                var data = new UnrealObject();
+                data.Deserialize(buffer, asset, ref cursor);
                 Table[key] = data;
             }
         }

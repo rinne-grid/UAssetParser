@@ -2,18 +2,18 @@
 using DragonLib.IO;
 using JetBrains.Annotations;
 using UObject.Enum;
-using UObject.Properties;
+using UObject.Generics;
 
 namespace UObject.Asset
 {
     [PublicAPI]
     public class ObjectExport : ISerializableObject
     {
-        public PackageIndex ClassIndex { get; set; }
-        public PackageIndex SuperIndex { get; set; }
-        public PackageIndex TemplateIndex { get; set; }
-        public PackageIndex OuterIndex { get; set; }
-        public Name ObjectName { get; set; }
+        public PackageIndex ClassIndex { get; set; } = new PackageIndex();
+        public PackageIndex SuperIndex { get; set; } = new PackageIndex();
+        public PackageIndex TemplateIndex { get; set; } = new PackageIndex();
+        public PackageIndex OuterIndex { get; set; } = new PackageIndex();
+        public Name ObjectName { get; set; } = new Name();
         public ObjectFlags ObjectFlags { get; set; }
         public long SerialSize { get; set; }
         public long SerialOffset { get; set; }
@@ -33,11 +33,11 @@ namespace UObject.Asset
 
         public void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor)
         {
-            ClassIndex = ObjectSerializer.DeserializeProperty<PackageIndex>(buffer, asset, ref cursor);
-            SuperIndex = ObjectSerializer.DeserializeProperty<PackageIndex>(buffer, asset, ref cursor);
-            TemplateIndex = ObjectSerializer.DeserializeProperty<PackageIndex>(buffer, asset, ref cursor);
-            OuterIndex = ObjectSerializer.DeserializeProperty<PackageIndex>(buffer, asset, ref cursor);
-            ObjectName = ObjectSerializer.DeserializeProperty<Name>(buffer, asset, ref cursor);
+            ClassIndex.Deserialize(buffer, asset, ref cursor);
+            SuperIndex.Deserialize(buffer, asset, ref cursor);
+            TemplateIndex.Deserialize(buffer, asset, ref cursor);
+            OuterIndex.Deserialize(buffer, asset, ref cursor);
+            ObjectName.Deserialize(buffer, asset, ref cursor);
             ObjectFlags = (ObjectFlags) SpanHelper.ReadLittleUInt(buffer, ref cursor);
             SerialSize = SpanHelper.ReadLittleLong(buffer, ref cursor);
             SerialOffset = SpanHelper.ReadLittleLong(buffer, ref cursor);

@@ -7,7 +7,7 @@ namespace UObject.Properties
     [PublicAPI]
     public class StrProperty : AbstractGuidProperty
     {
-        public string Value { get; set; }
+        public string Value { get; set; } = "None";
 
         public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor, bool ignoreTag)
         {

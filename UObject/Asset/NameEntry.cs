@@ -1,14 +1,14 @@
 ﻿using System;
 using DragonLib.IO;
 using JetBrains.Annotations;
-using UObject.Properties;
+using UObject.Generics;
 
 namespace UObject.Asset
 {
     [PublicAPI]
     public class NameEntry : ISerializableObject
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = "None";
         public ushort NonCasePreservingHash { get; set; }
         public ushort CasePreservingHash { get; set; }
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using DragonLib.IO;
 using JetBrains.Annotations;
-using UObject.Properties;
+using UObject.Generics;
 
 namespace UObject.Asset
 {
@@ -31,11 +31,11 @@ namespace UObject.Asset
 
         public AssetFile() { }
 
-        public PackageFileSummary Summary { get; set; }
-        public NameEntry[] Names { get; set; }
-        public ObjectImport[] Imports { get; set; }
-        public ObjectExport[] Exports { get; set; }
-        public PreloadDependencyIndex[] PreloadDependencies { get; set; }
+        public PackageFileSummary Summary { get; set; } = new PackageFileSummary();
+        public NameEntry[] Names { get; set; } = new NameEntry[0];
+        public ObjectImport[] Imports { get; set; } = new ObjectImport[0];
+        public ObjectExport[] Exports { get; set; } = new ObjectExport[0];
+        public PreloadDependencyIndex[] PreloadDependencies { get; set; } = new PreloadDependencyIndex[0];
 
         public Dictionary<string, ISerializableObject> ExportObjects { get; set; } = new Dictionary<string, ISerializableObject>();
     }

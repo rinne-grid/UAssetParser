@@ -5,6 +5,7 @@ using System.Text;
 using DragonLib.IO;
 using JetBrains.Annotations;
 using UObject.Asset;
+using UObject.Generics;
 using UObject.ObjectModel;
 using UObject.Properties;
 using UObject.Structs;
@@ -17,21 +18,16 @@ namespace UObject
         public static Dictionary<string, Type> PropertyTypes { get; } = new Dictionary<string, Type>
         {
             { nameof(ObjectProperty), typeof(ObjectProperty) },
-            { nameof(IntProperty), typeof(IntProperty) },
+            { nameof(SoftObjectProperty), typeof(SoftObjectProperty) },
+            { nameof(StructProperty), typeof(StructProperty) },
+            { nameof(NameProperty), typeof(NameProperty) },
             { nameof(StrProperty), typeof(StrProperty) },
-            { nameof(ArrayProperty), typeof(ArrayProperty) }
-        };
-
-        public static Dictionary<string, Type> StructTypes { get; } = new Dictionary<string, Type>
-        {
-            { nameof(Box), typeof(Box) },
-            { nameof(Box2D), typeof(Box2D) },
-            { nameof(Color), typeof(Color) },
-            { nameof(IntPoint), typeof(IntPoint) },
-            { nameof(LinearColor), typeof(LinearColor) },
-            { nameof(Rotator), typeof(Rotator) },
-            { nameof(Vector), typeof(Vector) },
-            { nameof(Vector2D), typeof(Vector2D) }
+            { nameof(ArrayProperty), typeof(ArrayProperty) },
+            { nameof(EnumProperty), typeof(EnumProperty) },
+            { nameof(IntProperty), typeof(IntProperty) },
+            { nameof(UInt32Property), typeof(UInt32Property) },
+            { nameof(FloatProperty), typeof(FloatProperty) },
+            { nameof(BoolProperty), typeof(BoolProperty) }
         };
 
         public static Dictionary<string, Type> ClassTypes { get; } = new Dictionary<string, Type>
@@ -49,7 +45,7 @@ namespace UObject
         public static string DeserializeString(Span<byte> buffer, ref int cursor)
         {
             var count = SpanHelper.ReadLittleInt(buffer, ref cursor);
-            var str = default(string);
+            var str = "None";
             if (count > 0)
             {
                 str = count == 1 ? string.Empty : Encoding.UTF8.GetString(buffer.Slice(cursor, count - 1));
@@ -58,23 +54,17 @@ namespace UObject
             else if (count < 0)
             {
                 str = count == -1 ? string.Empty : Encoding.Unicode.GetString(buffer.Slice(cursor, (0 - count) * 2 - 2));
-                cursor += count * 2;
+                cursor += (0 - count) * 2;
             }
 
             return str;
         }
 
-        public static T DeserializeProperty<T>(Span<byte> buffer, AssetFile asset, ref int cursor) where T : ISerializableObject, new()
-        {
-            var instance = new T();
-            instance.Deserialize(buffer, asset, ref cursor);
-            return instance;
-        }
-
         public static AbstractProperty DeserializeProperty(Span<byte> buffer, AssetFile asset, ref int cursor)
         {
             var start = cursor;
-            var tag = DeserializeProperty<PropertyTag>(buffer, asset, ref cursor);
+            var tag = new PropertyTag();
+            tag.Deserialize(buffer, asset, ref cursor);
             var tmp = cursor;
             cursor = start;
             return DeserializeProperty(buffer, asset, tag, tag.Type, tmp, ref cursor, false);
@@ -85,19 +75,13 @@ namespace UObject
             if (serializationType == null) throw new InvalidDataException();
             if (!PropertyTypes.TryGetValue(serializationType, out var propertyType))
             {
-                Logger.Warn("UObject", $"No Handler for property {tag.Name.Value} which has the type {serializationType} at offset {offset:X} (size {tag.Size})");
-                if (ignore) return null;
-                var instance = new AbstractProperty();
-                instance.Deserialize(buffer, asset, ref cursor);
-                cursor = offset + tag.Size;
-                return instance;
+                Logger.Error("UObject", $"No Handler for property {tag.Name.Value} which has the type {serializationType.Value} at offset {offset:X} (size {tag.Size})");
+                throw new NotImplementedException($"No Handler for property {tag.Name.Value} which has the type {serializationType.Value} at offset {offset:X} (size {tag.Size})");
             }
-            else
-            {
-                if (!(Activator.CreateInstance(propertyType) is AbstractProperty instance)) throw new InvalidDataException();
-                instance.Deserialize(buffer, asset, ref cursor, ignore);
-                return instance;
-            }
+
+            if (!(Activator.CreateInstance(propertyType) is AbstractProperty instance)) throw new InvalidDataException();
+            instance.Deserialize(buffer, asset, ref cursor, ignore);
+            return instance;
         }
 
         public static T[] DeserializeProperties<T>(Span<byte> buffer, AssetFile asset, int count, ref int cursor) where T : ISerializableObject, new()
@@ -118,8 +102,6 @@ namespace UObject
         {
             foreach (var instance in instances) instance.Deserialize(buffer, asset, ref cursor);
         }
-
-        public static void SerializeProperty<T>(ref Memory<byte> buffer, AssetFile asset, T instance, ref int cursor) where T : ISerializableObject, new() => instance.Serialize(ref buffer, asset, ref cursor);
 
         public static void SerializeProperties<T>(ref Memory<byte> buffer, AssetFile asset, T[] instances, ref int cursor) where T : ISerializableObject, new()
         {
@@ -156,13 +138,43 @@ namespace UObject
         {
             var blob = uexp.Length > 0 ? uexp.Slice((int) (export.SerialOffset - asset.Summary.TotalHeaderSize), (int) export.SerialSize) : uasset.Slice((int) export.SerialOffset, (int) export.SerialSize);
 
-            if (!ClassTypes.TryGetValue(export.ClassIndex.Name, out var classType)) throw new NotImplementedException(export.ClassIndex.Name);
+            if (!ClassTypes.TryGetValue(export.ClassIndex.Name ?? "None", out var classType)) throw new NotImplementedException(export.ClassIndex.Name);
 
             if (!(Activator.CreateInstance(classType) is ISerializableObject instance)) throw new NotImplementedException(export.ClassIndex.Name);
 
             var cursor = 0;
             instance.Deserialize(blob, asset, ref cursor);
             return instance;
+        }
+
+        public static object? DeserializeStruct(Span<byte> buffer, AssetFile asset, string structName, ref int cursor)
+        {
+            if (structName == null) throw new InvalidDataException();
+            switch (structName)
+            {
+                case nameof(Box):
+                    return SpanHelper.ReadStruct<Box>(buffer, ref cursor);
+                case nameof(Box2D):
+                    return SpanHelper.ReadStruct<Box2D>(buffer, ref cursor);
+                case nameof(Color):
+                    return SpanHelper.ReadStruct<Color>(buffer, ref cursor);
+                case nameof(IntPoint):
+                    return SpanHelper.ReadStruct<IntPoint>(buffer, ref cursor);
+                case nameof(LinearColor):
+                    return SpanHelper.ReadStruct<LinearColor>(buffer, ref cursor);
+                case nameof(Rotator):
+                    return SpanHelper.ReadStruct<Rotator>(buffer, ref cursor);
+                case nameof(Vector):
+                    return SpanHelper.ReadStruct<Vector>(buffer, ref cursor);
+                case nameof(Vector2D):
+                    return SpanHelper.ReadStruct<Vector2D>(buffer, ref cursor);
+                default:
+                {
+                    var obj = new UnrealObject();
+                    obj.Deserialize(buffer, asset, ref cursor);
+                    return obj;
+                }
+            }
         }
     }
 }
