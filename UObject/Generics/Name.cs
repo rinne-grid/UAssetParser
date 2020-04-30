@@ -13,7 +13,7 @@ namespace UObject.Generics
         public int Index { get; set; }
 
         [JsonIgnore]
-        public int ExIndex { get; set; }
+        public int InstanceNum { get; set; }
 
         public string Value { get; set; } = "None";
 
@@ -28,7 +28,7 @@ namespace UObject.Generics
         public void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor)
         {
             SpanHelper.WriteLittleInt(ref buffer, Index, ref cursor);
-            SpanHelper.WriteLittleInt(ref buffer, ExIndex, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, InstanceNum, ref cursor);
             // TODO: Recalculate Index.
         }
 
