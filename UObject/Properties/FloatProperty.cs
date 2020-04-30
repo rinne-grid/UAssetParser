@@ -5,11 +5,12 @@ using DragonLib.IO;
 using JetBrains.Annotations;
 using UObject.Asset;
 using UObject.Generics;
+using UObject.JSON;
 
 namespace UObject.Properties
 {
     [PublicAPI]
-    public class FloatProperty : AbstractProperty
+    public class FloatProperty : AbstractProperty, IValueType<float>
     {
         [JsonIgnore]
         public PropertyGuid Guid { get; set; } = new PropertyGuid();

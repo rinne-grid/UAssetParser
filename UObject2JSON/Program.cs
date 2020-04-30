@@ -7,6 +7,7 @@ using DragonLib.JSON;
 using JetBrains.Annotations;
 using UObject;
 using UObject.Asset;
+using UObject.JSON;
 
 namespace UObject2JSON
 {
@@ -27,25 +28,30 @@ namespace UObject2JSON
                 else if (File.Exists(path)) paths.Add(path);
             }
 
+            var settings = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                Converters =
+                {
+                    new GenericDictionaryConverterFactory(),
+                    new GenericListConverterFactory(),
+                    new ValueTypeConverterFactory()
+                }
+            };
+
+            var options = new AssetFileOptions
+            {
+                UnrealVersion = flags.UnrealVersion,
+                Workaround = flags.Workaround
+            };
+
             foreach (var path in paths)
             {
                 var arg = Path.Combine(Path.GetDirectoryName(path) ?? ".", Path.GetFileNameWithoutExtension(path));
                 var uasset = File.ReadAllBytes(arg + ".uasset");
                 var uexp = File.ReadAllBytes(arg + ".uexp");
                 Logger.Info("UAsset", arg);
-                var json = JsonSerializer.Serialize(ObjectSerializer.Deserialize(uasset, uexp, new AssetFileOptions
-                {
-                    UnrealVersion = flags.UnrealVersion,
-                    Workaround = flags.Workaround
-                }).ExportObjects, new JsonSerializerOptions
-                {
-                    WriteIndented = true,
-                    Converters =
-                    {
-                        new GenericDictionaryConverterFactory(),
-                        new GenericListConverterFactory()
-                    }
-                });
+                var json = JsonSerializer.Serialize(ObjectSerializer.Deserialize(uasset, uexp, options).ExportObjects, settings);
 
                 if (!string.IsNullOrWhiteSpace(flags.OutputFolder))
                 {

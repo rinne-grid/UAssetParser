@@ -3,11 +3,12 @@ using System.Globalization;
 using DragonLib.IO;
 using JetBrains.Annotations;
 using UObject.Asset;
+using UObject.JSON;
 
 namespace UObject.Properties
 {
     [PublicAPI]
-    public class IntProperty : AbstractGuidProperty
+    public class IntProperty : AbstractGuidProperty, IValueType<int>
     {
         public int Value { get; set; }
 

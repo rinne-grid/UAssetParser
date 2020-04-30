@@ -1,11 +1,12 @@
 ﻿using System;
 using JetBrains.Annotations;
 using UObject.Asset;
+using UObject.JSON;
 
 namespace UObject.Properties
 {
     [PublicAPI]
-    public class StrProperty : AbstractGuidProperty
+    public class StrProperty : AbstractGuidProperty, IValueType<string>
     {
         public string Value { get; set; } = "None";
 

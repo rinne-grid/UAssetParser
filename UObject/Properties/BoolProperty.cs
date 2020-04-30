@@ -5,16 +5,17 @@ using DragonLib.IO;
 using JetBrains.Annotations;
 using UObject.Asset;
 using UObject.Generics;
+using UObject.JSON;
 
 namespace UObject.Properties
 {
     [PublicAPI]
-    public class BoolProperty : AbstractProperty
+    public class BoolProperty : AbstractProperty, IValueType<bool>
     {
-        public bool Value { get; set; }
-
         [JsonIgnore]
         public PropertyGuid Guid { get; set; } = new PropertyGuid();
+
+        public bool Value { get; set; }
 
         public override string ToString() => Value.ToString(CultureInfo.InvariantCulture);
 

@@ -3,19 +3,18 @@ using System.Text.Json.Serialization;
 using DragonLib.IO;
 using JetBrains.Annotations;
 using UObject.Asset;
+using UObject.JSON;
 
 namespace UObject.Generics
 {
     [PublicAPI]
-    public class Name : ISerializableObject
+    public class Name : ISerializableObject, IValueType<string>
     {
         [JsonIgnore]
         public int Index { get; set; }
 
         [JsonIgnore]
         public int InstanceNum { get; set; }
-
-        public string Value { get; set; } = "None";
 
         public void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor)
         {
@@ -31,6 +30,8 @@ namespace UObject.Generics
             SpanHelper.WriteLittleInt(ref buffer, InstanceNum, ref cursor);
             // TODO: Recalculate Index.
         }
+
+        public string Value { get; set; } = "None";
 
         public static implicit operator string(Name? name) => name?.Value ?? "None";
     }

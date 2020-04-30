@@ -3,11 +3,12 @@ using System.Text.Json.Serialization;
 using JetBrains.Annotations;
 using UObject.Asset;
 using UObject.Generics;
+using UObject.JSON;
 
 namespace UObject.Properties
 {
     [PublicAPI]
-    public class NameProperty : AbstractProperty
+    public class NameProperty : AbstractProperty, IValueType<Name>
     {
         public Name Value { get; set; } = new Name();
 

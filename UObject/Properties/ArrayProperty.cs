@@ -5,13 +5,13 @@ using DragonLib.IO;
 using JetBrains.Annotations;
 using UObject.Asset;
 using UObject.Generics;
+using UObject.JSON;
 
 namespace UObject.Properties
 {
     [PublicAPI]
     public class ArrayProperty : AbstractProperty
     {
-        [JsonIgnore]
         public Name ArrayType { get; set; } = new Name();
 
         [JsonIgnore]

@@ -5,11 +5,12 @@ using DragonLib.IO;
 using JetBrains.Annotations;
 using UObject.Asset;
 using UObject.Generics;
+using UObject.JSON;
 
 namespace UObject.Properties
 {
     [PublicAPI]
-    public class UInt32Property : AbstractProperty
+    public class UInt32Property : AbstractProperty, IValueType<uint>
     {
         public uint Value { get; set; }
 
