@@ -15,7 +15,7 @@ namespace UObject.Properties
         [JsonIgnore]
         public override PropertyTag? Tag { get; set; }
 
-        public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor, bool isArray)
+        public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor)
         {
             Tag = new PropertyGuidTag();
             Tag.Deserialize(buffer, asset, ref cursor);
