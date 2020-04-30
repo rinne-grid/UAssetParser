@@ -20,7 +20,7 @@ namespace UObject.Generics
         public void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor)
         {
             Index = SpanHelper.ReadLittleInt(buffer, ref cursor);
-            ExIndex = SpanHelper.ReadLittleInt(buffer, ref cursor);
+            InstanceNum = SpanHelper.ReadLittleInt(buffer, ref cursor);
             if (asset.Names.Length < Index || Index < 0) return;
             Value = asset.Names[Index].Name;
         }
