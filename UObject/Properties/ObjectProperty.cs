@@ -9,15 +9,15 @@ namespace UObject.Properties
     {
         public PackageIndex PackageIndex { get; set; } = new PackageIndex();
 
-        public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor, bool ignore)
+        public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor, bool isArray)
         {
-            base.Deserialize(buffer, asset, ref cursor, ignore);
+            base.Deserialize(buffer, asset, ref cursor, isArray);
             PackageIndex.Deserialize(buffer, asset, ref cursor);
         }
 
-        public override void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor)
+        public override void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor, bool isArray)
         {
-            base.Serialize(ref buffer, asset, ref cursor);
+            base.Serialize(ref buffer, asset, ref cursor, isArray);
             PackageIndex.Serialize(ref buffer, asset, ref cursor);
         }
     }

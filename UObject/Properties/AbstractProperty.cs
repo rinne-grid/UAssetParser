@@ -7,7 +7,7 @@ using UObject.Generics;
 namespace UObject.Properties
 {
     [PublicAPI]
-    public class AbstractProperty : IPropertyObject
+    public abstract class AbstractProperty : IPropertyObject
     {
         [JsonIgnore]
         public virtual PropertyTag? Tag { get; set; }
@@ -20,10 +20,16 @@ namespace UObject.Properties
 
         public virtual void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor) => Tag?.Serialize(ref buffer, asset, ref cursor);
 
-        public virtual void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor, bool ignoreTag)
+        public virtual void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor, bool isArray)
         {
-            if (ignoreTag) return;
+            if (isArray) return;
             Deserialize(buffer, asset, ref cursor);
+        }
+
+        public virtual void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor, bool isArray)
+        {
+            if (isArray) return;
+            Serialize(ref buffer, asset, ref cursor);
         }
     }
 }

@@ -7,7 +7,7 @@ using UObject.Generics;
 namespace UObject.Properties
 {
     [PublicAPI]
-    public class AbstractGuidProperty : AbstractProperty
+    public abstract class AbstractGuidProperty : AbstractProperty
     {
         [JsonIgnore]
         public PropertyGuid Guid => (Tag as PropertyGuidTag)?.Guid ?? new PropertyGuid();
@@ -15,7 +15,7 @@ namespace UObject.Properties
         [JsonIgnore]
         public override PropertyTag? Tag { get; set; }
 
-        public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor)
+        public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor, bool isArray)
         {
             Tag = new PropertyGuidTag();
             Tag.Deserialize(buffer, asset, ref cursor);

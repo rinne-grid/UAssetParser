@@ -17,23 +17,34 @@ namespace UObject.Properties
         [JsonIgnore]
         public PropertyGuid Guid { get; set; } = new PropertyGuid();
 
-        public List<object?> Values { get; set; } = new List<object?>();
+        public List<object?> Value { get; set; } = new List<object?>();
 
-        public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor, bool ignore)
+        public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor, bool isArray)
         {
-            base.Deserialize(buffer, asset, ref cursor, ignore);
+            Logger.Assert(isArray == false, "isArray == false");
+            base.Deserialize(buffer, asset, ref cursor, isArray);
             ArrayType.Deserialize(buffer, asset, ref cursor);
             Guid.Deserialize(buffer, asset, ref cursor);
             var count = SpanHelper.ReadLittleInt(buffer, ref cursor);
             if (ArrayType == "StructProperty")
             {
                 var structProperty = ObjectSerializer.DeserializeProperty(buffer, asset, Tag ?? new PropertyTag(), ArrayType, cursor, ref cursor, true) as StructProperty;
-                for (var i = 0; i < count; ++i) Values.Add(ObjectSerializer.DeserializeStruct(buffer, asset, structProperty?.StructName ?? "None", ref cursor));
+                for (var i = 0; i < count; ++i) Value.Add(ObjectSerializer.DeserializeStruct(buffer, asset, structProperty?.StructName ?? "None", ref cursor));
             }
             else
             {
-                for (var i = 0; i < count; ++i) Values.Add(ObjectSerializer.DeserializeProperty(buffer, asset, Tag ?? new PropertyTag(), ArrayType, cursor, ref cursor, true));
+                for (var i = 0; i < count; ++i) Value.Add(ObjectSerializer.DeserializeProperty(buffer, asset, Tag ?? new PropertyTag(), ArrayType, cursor, ref cursor, true));
             }
+        }
+
+        public override void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor, bool isArray)
+        {
+            Logger.Assert(isArray == false, "isArray == false");
+            base.Serialize(ref buffer, asset, ref cursor, isArray);
+            ArrayType.Serialize(ref buffer, asset, ref cursor);
+            Guid.Serialize(ref buffer, asset, ref cursor);
+            SpanHelper.WriteLittleInt(ref buffer, Value.Count, ref cursor);
+            // TODO: Serialize struct data
         }
     }
 }

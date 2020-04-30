@@ -23,6 +23,7 @@ namespace UObject
             { nameof(NameProperty), typeof(NameProperty) },
             { nameof(StrProperty), typeof(StrProperty) },
             { nameof(ArrayProperty), typeof(ArrayProperty) },
+            { nameof(MapProperty), typeof(MapProperty) },
             { nameof(EnumProperty), typeof(EnumProperty) },
             { nameof(IntProperty), typeof(IntProperty) },
             { nameof(UInt32Property), typeof(UInt32Property) },
@@ -70,7 +71,7 @@ namespace UObject
             return DeserializeProperty(buffer, asset, tag, tag.Type, tmp, ref cursor, false);
         }
 
-        public static AbstractProperty DeserializeProperty(Span<byte> buffer, AssetFile asset, PropertyTag tag, Name serializationType, int offset, ref int cursor, bool ignore)
+        public static AbstractProperty DeserializeProperty(Span<byte> buffer, AssetFile asset, PropertyTag tag, Name serializationType, int offset, ref int cursor, bool isArray)
         {
             if (serializationType == null) throw new InvalidDataException();
             if (!PropertyTypes.TryGetValue(serializationType, out var propertyType))
@@ -80,7 +81,7 @@ namespace UObject
             }
 
             if (!(Activator.CreateInstance(propertyType) is AbstractProperty instance)) throw new InvalidDataException();
-            instance.Deserialize(buffer, asset, ref cursor, ignore);
+            instance.Deserialize(buffer, asset, ref cursor, isArray);
             return instance;
         }
 

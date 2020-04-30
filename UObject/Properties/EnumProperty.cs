@@ -16,26 +16,29 @@ namespace UObject.Properties
 
         public Name Value { get; set; } = new Name();
 
-        public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor, bool ignoreTag)
+        public override string ToString() => Value;
+
+        public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor, bool isArray)
         {
-            base.Deserialize(buffer, asset, ref cursor, ignoreTag);
-            if (!ignoreTag)
+            base.Deserialize(buffer, asset, ref cursor, isArray);
+            if (!isArray)
             {
                 EnumName.Deserialize(buffer, asset, ref cursor);
                 Guid.Deserialize(buffer, asset, ref cursor);
-                Value.Deserialize(buffer, asset, ref cursor);
             }
-            else
-            {
-                Value.Deserialize(buffer, asset, ref cursor);
-            }
+
+            Value.Deserialize(buffer, asset, ref cursor);
         }
 
-        public override void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor)
+        public override void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor, bool isArray)
         {
-            base.Serialize(ref buffer, asset, ref cursor);
-            EnumName.Serialize(ref buffer, asset, ref cursor);
-            Guid.Serialize(ref buffer, asset, ref cursor);
+            base.Serialize(ref buffer, asset, ref cursor, isArray);
+            if (!isArray)
+            {
+                EnumName.Serialize(ref buffer, asset, ref cursor);
+                Guid.Serialize(ref buffer, asset, ref cursor);
+            }
+
             Value.Serialize(ref buffer, asset, ref cursor);
         }
     }

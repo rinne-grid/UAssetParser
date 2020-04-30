@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Text.Json.Serialization;
 using DragonLib.IO;
 using JetBrains.Annotations;
@@ -15,18 +16,20 @@ namespace UObject.Properties
 
         public float Value { get; set; }
 
-        public override void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor)
+        public override string ToString() => Value.ToString(CultureInfo.InvariantCulture);
+
+        public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor, bool isArray)
         {
-            base.Serialize(ref buffer, asset, ref cursor);
-            SpanHelper.WriteLittleSingle(ref buffer, Value, ref cursor);
-            Guid.Serialize(ref buffer, asset, ref cursor);
+            base.Deserialize(buffer, asset, ref cursor, isArray);
+            Value = SpanHelper.ReadLittleSingle(buffer, ref cursor);
+            if (!isArray) Guid.Deserialize(buffer, asset, ref cursor);
         }
 
-        public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor, bool ignoreTag)
+        public override void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor, bool isArray)
         {
-            base.Deserialize(buffer, asset, ref cursor, ignoreTag);
-            Value = SpanHelper.ReadLittleSingle(buffer, ref cursor);
-            if (!ignoreTag) Guid.Deserialize(buffer, asset, ref cursor);
+            base.Serialize(ref buffer, asset, ref cursor, isArray);
+            SpanHelper.WriteLittleSingle(ref buffer, Value, ref cursor);
+            if (!isArray) Guid.Serialize(ref buffer, asset, ref cursor);
         }
     }
 }
