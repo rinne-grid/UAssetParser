@@ -31,6 +31,8 @@ namespace UObject.Properties
             Reserved = SpanHelper.ReadLittleInt(buffer, ref cursor);
             Logger.Assert(Reserved == 0, "Reserved == 0");
             var count = SpanHelper.ReadLittleInt(buffer, ref cursor);
+            var valueMode = SerializationMode.Map;
+            if (ValueType == "ByteProperty" && Tag?.Size != 1) valueMode &= SerializationMode.ByteAsEnum;
             for (var i = 0; i < count; ++i)
             {
                 var key = ObjectSerializer.DeserializeProperty(buffer, asset, Tag ?? new PropertyTag(), KeyType, cursor, ref cursor, SerializationMode.Map);
@@ -38,7 +40,7 @@ namespace UObject.Properties
                 if (ValueType == "StructProperty")
                     Value[key.ToString() ?? $"{cursor:X}"] = ObjectSerializer.DeserializeStruct(buffer, asset, "None", ref cursor);
                 else
-                    Value[key.ToString() ?? $"{cursor:X}"] = ObjectSerializer.DeserializeProperty(buffer, asset, Tag ?? new PropertyTag(), ValueType, cursor, ref cursor, SerializationMode.Map);
+                    Value[key.ToString() ?? $"{cursor:X}"] = ObjectSerializer.DeserializeProperty(buffer, asset, Tag ?? new PropertyTag(), ValueType, cursor, ref cursor, valueMode);
             }
         }
 

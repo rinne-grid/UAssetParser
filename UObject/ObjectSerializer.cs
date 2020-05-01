@@ -26,7 +26,7 @@ namespace UObject
             { nameof(ArrayProperty), typeof(ArrayProperty) },
             { nameof(MapProperty), typeof(MapProperty) },
             { nameof(EnumProperty), typeof(EnumProperty) },
-            // { nameof(ByteProperty), typeof(ByteProperty) },
+            { nameof(ByteProperty), typeof(ByteProperty) },
             { "ShortProperty", typeof(Int16Property) },
             { "UShortProperty", typeof(UInt16Property) },
             { "IntProperty", typeof(Int32Property) },

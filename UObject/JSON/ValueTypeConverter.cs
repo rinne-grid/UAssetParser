@@ -15,6 +15,6 @@ namespace UObject.JSON
             return valueType;
         }
 
-        public override void Write(Utf8JsonWriter writer, IValueType<T> value, JsonSerializerOptions options) => JsonSerializer.Serialize(writer, value.Value, typeof(T), options);
+        public override void Write(Utf8JsonWriter writer, IValueType<T> value, JsonSerializerOptions options) => JsonSerializer.Serialize(writer, value.Value, value.Value?.GetType() ?? typeof(void), options);
     }
 }

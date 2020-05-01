@@ -35,7 +35,9 @@ namespace UObject.Properties
             }
             else
             {
-                for (var i = 0; i < count; ++i) Value.Add(ObjectSerializer.DeserializeProperty(buffer, asset, Tag ?? new PropertyTag(), ArrayType, cursor, ref cursor, SerializationMode.Array));
+                var arrayMode = SerializationMode.Array;
+                if (ArrayType == "ByteProperty" && Tag?.Size != 1) arrayMode &= SerializationMode.ByteAsEnum;
+                for (var i = 0; i < count; ++i) Value.Add(ObjectSerializer.DeserializeProperty(buffer, asset, Tag ?? new PropertyTag(), ArrayType, cursor, ref cursor, arrayMode));
             }
         }
 
