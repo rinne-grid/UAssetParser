@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 using JetBrains.Annotations;
 using UObject.Asset;
+using UObject.Enum;
 using UObject.Generics;
 using UObject.JSON;
 
@@ -19,10 +20,10 @@ namespace UObject.Properties
 
         public override string ToString() => Value;
 
-        public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor, bool isArray)
+        public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor, SerializationMode mode)
         {
-            base.Deserialize(buffer, asset, ref cursor, isArray);
-            if (!isArray)
+            base.Deserialize(buffer, asset, ref cursor, mode);
+            if (mode == SerializationMode.Normal)
             {
                 EnumName.Deserialize(buffer, asset, ref cursor);
                 Guid.Deserialize(buffer, asset, ref cursor);
@@ -31,10 +32,10 @@ namespace UObject.Properties
             Value.Deserialize(buffer, asset, ref cursor);
         }
 
-        public override void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor, bool isArray)
+        public override void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor, SerializationMode mode)
         {
-            base.Serialize(ref buffer, asset, ref cursor, isArray);
-            if (!isArray)
+            base.Serialize(ref buffer, asset, ref cursor, mode);
+            if (mode == SerializationMode.Normal)
             {
                 EnumName.Serialize(ref buffer, asset, ref cursor);
                 Guid.Serialize(ref buffer, asset, ref cursor);

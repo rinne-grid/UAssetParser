@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using UObject.Asset;
 using UObject.Generics;
+using UObject.Properties;
 
 namespace UObject.ObjectModel
 {
     [PublicAPI]
     public class UnrealObject : ISerializableObject
     {
-        public Dictionary<string, object> Entries { get; set; } = new Dictionary<string, object>();
+        public Dictionary<string, AbstractProperty> Value { get; set; } = new Dictionary<string, AbstractProperty>();
 
         public virtual void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor)
         {
@@ -22,7 +23,7 @@ namespace UObject.ObjectModel
                 // rollback
                 cursor = tmp;
                 var property = ObjectSerializer.DeserializeProperty(buffer, asset, ref cursor);
-                Entries[property.Tag?.Name ?? $"{cursor:X}"] = property;
+                Value[property.Tag?.Name ?? $"{cursor:X}"] = property;
             }
         }
 

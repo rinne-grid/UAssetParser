@@ -9,10 +9,7 @@ namespace UObject.JSON
     [PublicAPI]
     public class ValueTypeConverterFactory : JsonConverterFactory
     {
-        public override bool CanConvert(Type typeToConvert)
-        {
-            return typeToConvert.GetInterfaces().Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IValueType<>));
-        }
+        public override bool CanConvert(Type typeToConvert) => typeToConvert.GetInterfaces().Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IValueType<>));
 
         public override JsonConverter CreateConverter(Type typeToConvert, JsonSerializerOptions options)
         {

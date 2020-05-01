@@ -5,6 +5,7 @@ using System.Text;
 using DragonLib.IO;
 using JetBrains.Annotations;
 using UObject.Asset;
+using UObject.Enum;
 using UObject.Generics;
 using UObject.ObjectModel;
 using UObject.Properties;
@@ -68,10 +69,10 @@ namespace UObject
             tag.Deserialize(buffer, asset, ref cursor);
             var tmp = cursor;
             cursor = start;
-            return DeserializeProperty(buffer, asset, tag, tag.Type, tmp, ref cursor, false);
+            return DeserializeProperty(buffer, asset, tag, tag.Type, tmp, ref cursor, SerializationMode.Normal);
         }
 
-        public static AbstractProperty DeserializeProperty(Span<byte> buffer, AssetFile asset, PropertyTag tag, Name serializationType, int offset, ref int cursor, bool isArray)
+        public static AbstractProperty DeserializeProperty(Span<byte> buffer, AssetFile asset, PropertyTag tag, Name serializationType, int offset, ref int cursor, SerializationMode mode)
         {
             if (serializationType == null) throw new InvalidDataException();
             if (!PropertyTypes.TryGetValue(serializationType, out var propertyType))
@@ -81,7 +82,7 @@ namespace UObject
             }
 
             if (!(Activator.CreateInstance(propertyType) is AbstractProperty instance)) throw new InvalidDataException();
-            instance.Deserialize(buffer, asset, ref cursor, isArray);
+            instance.Deserialize(buffer, asset, ref cursor, mode);
             return instance;
         }
 

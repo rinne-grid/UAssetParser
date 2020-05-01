@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using DragonLib.IO;
 using JetBrains.Annotations;
 using UObject.Asset;
+using UObject.Enum;
 using UObject.Generics;
 
 namespace UObject.Properties
@@ -20,10 +21,10 @@ namespace UObject.Properties
         public int Reserved { get; set; }
         public Dictionary<string, object?> Value { get; set; } = new Dictionary<string, object?>();
 
-        public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor, bool isArray)
+        public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor, SerializationMode mode)
         {
-            Logger.Assert(isArray == false, "isArray == false");
-            base.Deserialize(buffer, asset, ref cursor, isArray);
+            Logger.Assert(mode == SerializationMode.Normal, "mode == SerializationMode.Normal");
+            base.Deserialize(buffer, asset, ref cursor, mode);
             KeyType.Deserialize(buffer, asset, ref cursor);
             ValueType.Deserialize(buffer, asset, ref cursor);
             Guid.Deserialize(buffer, asset, ref cursor);
@@ -32,16 +33,19 @@ namespace UObject.Properties
             var count = SpanHelper.ReadLittleInt(buffer, ref cursor);
             for (var i = 0; i < count; ++i)
             {
-                var key = ObjectSerializer.DeserializeProperty(buffer, asset, Tag ?? new PropertyTag(), KeyType, cursor, ref cursor, true);
-                var value = ObjectSerializer.DeserializeProperty(buffer, asset, Tag ?? new PropertyTag(), ValueType, cursor, ref cursor, true);
-                Value[key.ToString() ?? $"{cursor:X}"] = value;
+                var key = ObjectSerializer.DeserializeProperty(buffer, asset, Tag ?? new PropertyTag(), KeyType, cursor, ref cursor, SerializationMode.Map);
+
+                if (ValueType == "StructProperty")
+                    Value[key.ToString() ?? $"{cursor:X}"] = ObjectSerializer.DeserializeStruct(buffer, asset, "None", ref cursor);
+                else
+                    Value[key.ToString() ?? $"{cursor:X}"] = ObjectSerializer.DeserializeProperty(buffer, asset, Tag ?? new PropertyTag(), ValueType, cursor, ref cursor, SerializationMode.Map);
             }
         }
 
-        public override void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor, bool isArray)
+        public override void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor, SerializationMode mode)
         {
-            Logger.Assert(isArray == false, "isArray == false");
-            base.Serialize(ref buffer, asset, ref cursor, isArray);
+            Logger.Assert(mode == SerializationMode.Normal, "mode == SerializationMode.Normal");
+            base.Serialize(ref buffer, asset, ref cursor, mode);
             KeyType.Serialize(ref buffer, asset, ref cursor);
             ValueType.Serialize(ref buffer, asset, ref cursor);
             Guid.Serialize(ref buffer, asset, ref cursor);

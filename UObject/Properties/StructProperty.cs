@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using DragonLib.IO;
 using JetBrains.Annotations;
 using UObject.Asset;
+using UObject.Enum;
 using UObject.Generics;
 using UObject.ObjectModel;
 
@@ -20,22 +21,30 @@ namespace UObject.Properties
 
         public object? Value { get; set; }
 
-        public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor, bool isArray)
+        public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor, SerializationMode mode)
         {
-            base.Deserialize(buffer, asset, ref cursor, false);
+            base.Deserialize(buffer, asset, ref cursor, mode);
             StructName.Deserialize(buffer, asset, ref cursor);
-            StructGuid = SpanHelper.ReadStruct<Guid>(buffer, ref cursor);
-            Guid.Deserialize(buffer, asset, ref cursor);
-            if (!isArray) Value = ObjectSerializer.DeserializeStruct(buffer, asset, StructName, ref cursor);
+            if (mode == SerializationMode.Normal || mode == SerializationMode.Array)
+            {
+                StructGuid = SpanHelper.ReadStruct<Guid>(buffer, ref cursor);
+                Guid.Deserialize(buffer, asset, ref cursor);
+            }
+
+            if (mode == SerializationMode.Normal) Value = ObjectSerializer.DeserializeStruct(buffer, asset, StructName, ref cursor);
         }
 
-        public override void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor, bool isArray)
+        public override void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor, SerializationMode mode)
         {
-            base.Serialize(ref buffer, asset, ref cursor);
+            base.Serialize(ref buffer, asset, ref cursor, mode);
             StructName.Serialize(ref buffer, asset, ref cursor);
-            SpanHelper.WriteStruct(ref buffer, StructGuid, ref cursor);
-            Guid.Serialize(ref buffer, asset, ref cursor);
-            if (!isArray)
+            if (mode == SerializationMode.Normal || mode == SerializationMode.Array)
+            {
+                SpanHelper.WriteStruct(ref buffer, StructGuid, ref cursor);
+                Guid.Serialize(ref buffer, asset, ref cursor);
+            }
+
+            if (mode == SerializationMode.Normal)
             {
                 if (Value is UnrealObject uobject)
                     uobject.Serialize(ref buffer, asset, ref cursor);

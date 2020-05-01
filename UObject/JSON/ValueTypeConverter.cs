@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using JetBrains.Annotations;
 
 namespace UObject.JSON
 {
+    [PublicAPI]
     public class ValueTypeConverter<T> : JsonConverter<IValueType<T>>
     {
         public override IValueType<T> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -13,9 +15,6 @@ namespace UObject.JSON
             return valueType;
         }
 
-        public override void Write(Utf8JsonWriter writer, IValueType<T> value, JsonSerializerOptions options)
-        {
-            JsonSerializer.Serialize(writer, value.Value, typeof(T), options);
-        }
+        public override void Write(Utf8JsonWriter writer, IValueType<T> value, JsonSerializerOptions options) => JsonSerializer.Serialize(writer, value.Value, typeof(T), options);
     }
 }

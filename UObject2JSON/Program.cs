@@ -35,7 +35,8 @@ namespace UObject2JSON
                 {
                     new GenericDictionaryConverterFactory(),
                     new GenericListConverterFactory(),
-                    new ValueTypeConverterFactory()
+                    new ValueTypeConverterFactory(),
+                    new UnrealObjectConverter()
                 }
             };
 
