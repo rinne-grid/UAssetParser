@@ -34,5 +34,7 @@ namespace UObject.Generics
         public string Value { get; set; } = "None";
 
         public static implicit operator string(Name? name) => name?.Value ?? "None";
+
+        public override string ToString() => Value;
     }
 }
