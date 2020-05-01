@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using DragonLib.CLI;
 using DragonLib.IO;
 using DragonLib.JSON;
@@ -33,9 +34,9 @@ namespace UObject2JSON
                 WriteIndented = true,
                 Converters =
                 {
-                    new GenericDictionaryConverterFactory(),
-                    new GenericListConverterFactory(),
-                    new ValueTypeConverterFactory(),
+                    flags.Typeless ? (JsonConverter) new GenericTypelessDictionaryConverterFactory() : new GenericDictionaryConverterFactory(),
+                    flags.Typeless ? (JsonConverter) new GenericTypelessListConverterFactory() : new GenericListConverterFactory(),
+                    new ValueTypeConverterFactory(flags.Typeless),
                     new UnrealObjectConverter()
                 }
             };

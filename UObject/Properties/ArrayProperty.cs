@@ -6,11 +6,12 @@ using JetBrains.Annotations;
 using UObject.Asset;
 using UObject.Enum;
 using UObject.Generics;
+using UObject.JSON;
 
 namespace UObject.Properties
 {
     [PublicAPI]
-    public class ArrayProperty : AbstractProperty
+    public class ArrayProperty : AbstractProperty, IArrayValueType<List<object?>>
     {
         public Name ArrayType { get; set; } = new Name();
 
@@ -36,7 +37,7 @@ namespace UObject.Properties
             else
             {
                 var arrayMode = SerializationMode.Array;
-                if (ArrayType == "ByteProperty" && Tag?.Size != 1) arrayMode &= SerializationMode.ByteAsEnum;
+                if (ArrayType == "ByteProperty" && Tag?.Size > 0 && Tag?.Size / count != 1) arrayMode &= SerializationMode.ByteAsEnum;
                 for (var i = 0; i < count; ++i) Value.Add(ObjectSerializer.DeserializeProperty(buffer, asset, Tag ?? new PropertyTag(), ArrayType, cursor, ref cursor, arrayMode));
             }
         }

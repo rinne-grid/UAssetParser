@@ -6,12 +6,13 @@ using JetBrains.Annotations;
 using UObject.Asset;
 using UObject.Enum;
 using UObject.Generics;
+using UObject.JSON;
 using UObject.ObjectModel;
 
 namespace UObject.Properties
 {
     [PublicAPI]
-    public class StructProperty : AbstractProperty
+    public class StructProperty : AbstractProperty, IArrayValueType<object?>
     {
         public Name StructName { get; set; } = new Name();
         public Guid StructGuid { get; set; } = System.Guid.Empty;

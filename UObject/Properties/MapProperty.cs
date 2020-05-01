@@ -6,11 +6,12 @@ using JetBrains.Annotations;
 using UObject.Asset;
 using UObject.Enum;
 using UObject.Generics;
+using UObject.JSON;
 
 namespace UObject.Properties
 {
     [PublicAPI]
-    public class MapProperty : AbstractProperty
+    public class MapProperty : AbstractProperty, IArrayValueType<Dictionary<string, object?>>
     {
         public Name KeyType { get; set; } = new Name();
         public Name ValueType { get; set; } = new Name();
