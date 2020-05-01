@@ -10,22 +10,22 @@ namespace UObject.Properties
 {
     // TODO: Validate if GUID is BEFORE or AFTER Value.
     [PublicAPI]
-    public class UIntProperty : AbstractGuidProperty, IValueType<uint>
+    public class Int16Property : AbstractGuidProperty, IValueType<short>
     {
-        public uint Value { get; set; }
+        public short Value { get; set; }
 
         public override string ToString() => Value.ToString(CultureInfo.InvariantCulture);
 
         public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor, SerializationMode mode)
         {
             base.Deserialize(buffer, asset, ref cursor, mode);
-            Value = SpanHelper.ReadLittleUInt(buffer, ref cursor);
+            Value = SpanHelper.ReadLittleShort(buffer, ref cursor);
         }
 
         public override void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor, SerializationMode mode)
         {
             base.Serialize(ref buffer, asset, ref cursor, mode);
-            SpanHelper.WriteLittleUInt(ref buffer, Value, ref cursor);
+            SpanHelper.WriteLittleShort(ref buffer, Value, ref cursor);
         }
     }
 }

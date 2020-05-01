@@ -10,7 +10,7 @@ namespace UObject.Properties
 {
     // TODO: Validate if GUID is BEFORE or AFTER Value.
     [PublicAPI]
-    public class ULongProperty : AbstractGuidProperty, IValueType<ulong>
+    public class UInt64Property : AbstractGuidProperty, IValueType<ulong>
     {
         public ulong Value { get; set; }
 

@@ -9,7 +9,7 @@ using UObject.JSON;
 namespace UObject.Properties
 {
     [PublicAPI]
-    public class IntProperty : AbstractGuidProperty, IValueType<int>
+    public class Int32Property : AbstractGuidProperty, IValueType<int>
     {
         public int Value { get; set; }
 
