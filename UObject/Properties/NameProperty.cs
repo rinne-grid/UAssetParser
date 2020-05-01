@@ -21,15 +21,15 @@ namespace UObject.Properties
         public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor, SerializationMode mode)
         {
             base.Deserialize(buffer, asset, ref cursor, mode);
-            Value.Deserialize(buffer, asset, ref cursor);
             if (mode == SerializationMode.Normal) Guid.Deserialize(buffer, asset, ref cursor);
+            Value.Deserialize(buffer, asset, ref cursor);
         }
 
         public override void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor, SerializationMode mode)
         {
             base.Serialize(ref buffer, asset, ref cursor);
-            Value.Serialize(ref buffer, asset, ref cursor);
             if (mode == SerializationMode.Normal) Guid.Serialize(ref buffer, asset, ref cursor);
+            Value.Serialize(ref buffer, asset, ref cursor);
         }
     }
 }
