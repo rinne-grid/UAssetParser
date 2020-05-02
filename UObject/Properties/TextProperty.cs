@@ -25,10 +25,12 @@ namespace UObject.Properties
             base.Deserialize(buffer, asset, ref cursor, mode);
             ReservedHashInt = SpanHelper.ReadLittleInt(buffer, ref cursor);
             ReservedValueInt = SpanHelper.ReadLittleInt(buffer, ref cursor);
+            // Is only present if ReservedHashInt is 8, I've only found cases of 0 or 8.
             if (ReservedHashInt != 0) HashGuid.Deserialize(buffer, asset, ref cursor);
 
             ValueGuid.Deserialize(buffer, asset, ref cursor);
 
+            // ReservedValueInt is 256 (0x100) when values are present, but 255 (0xFF) when not present. I've only found cases of 256 or 255.
             if (ReservedValueInt != 0xFF)
             {
                 Hash = ObjectSerializer.DeserializeString(buffer, ref cursor);
