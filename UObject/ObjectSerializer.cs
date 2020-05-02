@@ -23,6 +23,7 @@ namespace UObject
             { nameof(StructProperty), typeof(StructProperty) },
             { nameof(NameProperty), typeof(NameProperty) },
             { nameof(StrProperty), typeof(StrProperty) },
+            { nameof(TextProperty), typeof(TextProperty) },
             { nameof(ArrayProperty), typeof(ArrayProperty) },
             { nameof(MapProperty), typeof(MapProperty) },
             { nameof(EnumProperty), typeof(EnumProperty) },

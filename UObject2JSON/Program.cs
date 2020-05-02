@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -37,7 +38,8 @@ namespace UObject2JSON
                     flags.Typeless ? (JsonConverter) new GenericTypelessDictionaryConverterFactory() : new GenericDictionaryConverterFactory(),
                     flags.Typeless ? (JsonConverter) new GenericTypelessListConverterFactory() : new GenericListConverterFactory(),
                     new ValueTypeConverterFactory(flags.Typeless),
-                    new UnrealObjectConverter()
+                    new UnrealObjectConverter(),
+                    new NoneStringConverter()
                 }
             };
 
@@ -51,7 +53,7 @@ namespace UObject2JSON
             {
                 var arg = Path.Combine(Path.GetDirectoryName(path) ?? ".", Path.GetFileNameWithoutExtension(path));
                 var uasset = File.ReadAllBytes(arg + ".uasset");
-                var uexp = File.ReadAllBytes(arg + ".uexp");
+                var uexp = File.Exists(arg + ".uexp") ? File.ReadAllBytes(arg + ".uexp") : Span<byte>.Empty;
                 Logger.Info("UAsset", arg);
                 var json = JsonSerializer.Serialize(ObjectSerializer.Deserialize(uasset, uexp, options).ExportObjects, settings);
 
