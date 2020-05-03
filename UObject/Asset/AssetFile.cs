@@ -11,6 +11,8 @@ namespace UObject.Asset
     {
         public AssetFile(Span<byte> uasset, Span<byte> uexp, AssetFileOptions options)
         {
+            Options = options;
+            
             var cursor = 0;
             Summary = new PackageFileSummary();
             Summary.Deserialize(uasset, this, options, ref cursor);
@@ -28,6 +30,8 @@ namespace UObject.Asset
 
             foreach (var export in Exports) ExportObjects[export.ObjectName] = ObjectSerializer.DeserializeObject(this, export, uasset, uexp);
         }
+
+        public AssetFileOptions Options { get; set; }
 
         public AssetFile() { }
 

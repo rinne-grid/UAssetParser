@@ -28,7 +28,7 @@ namespace UObject.Properties
                 Guid.Deserialize(buffer, asset, ref cursor);
             }
 
-            if (mode == SerializationMode.Normal && EnumName.Value == "None" || !mode.HasFlag(SerializationMode.ByteAsEnum))
+            if (mode == SerializationMode.Normal && EnumName.Value == "None" || mode.HasFlag(SerializationMode.ByteAsEnum))
             {
                 Value = SpanHelper.ReadByte(buffer, ref cursor);
             }

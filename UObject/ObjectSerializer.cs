@@ -150,13 +150,13 @@ namespace UObject
 
         public static ISerializableObject DeserializeObject(AssetFile asset, ObjectExport export, Span<byte> uasset, Span<byte> uexp)
         {
-            var blob = uexp.Length > 0 ? uexp.Slice((int) (export.SerialOffset - asset.Summary.TotalHeaderSize), (int) export.SerialSize) : uasset.Slice((int) export.SerialOffset, (int) export.SerialSize);
-
+            var blob = uexp.Length > 0 ? uexp : uasset;
+            
             if (!ClassTypes.TryGetValue(export.ClassIndex.Name ?? "None", out var classType)) throw new NotImplementedException(export.ClassIndex.Name);
 
             if (!(Activator.CreateInstance(classType) is ISerializableObject instance)) throw new NotImplementedException(export.ClassIndex.Name);
 
-            var cursor = 0;
+            var cursor = (int) (uexp.Length > 0 ? (export.SerialOffset - asset.Summary.TotalHeaderSize) : export.SerialOffset);
             instance.Deserialize(blob, asset, ref cursor);
             return instance;
         }

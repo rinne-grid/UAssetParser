@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using DragonLib.IO;
 using JetBrains.Annotations;
 using UObject.Asset;
@@ -11,9 +12,12 @@ namespace UObject.Properties
     [PublicAPI]
     public class TextProperty : AbstractGuidProperty, IValueType<string>
     {
-        public int ReservedHashInt { get; set; }
-        public PropertyGuid HashGuid { get; set; } = new PropertyGuid();
-        public int ReservedValueInt { get; set; }
+        public int SerializationFlags { get; set; }
+        public byte Flags { get; set; }
+        public int Unknown3 { get; set; }
+        #if DEBUG
+        public static HashSet<int> Unknown3Set = new HashSet<int>();
+        #endif
         public PropertyGuid ValueGuid { get; set; } = new PropertyGuid();
         public string Hash { get; set; } = "None";
         public string Value { get; set; } = "None";
@@ -23,33 +27,38 @@ namespace UObject.Properties
         public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor, SerializationMode mode)
         {
             base.Deserialize(buffer, asset, ref cursor, mode);
-            ReservedHashInt = SpanHelper.ReadLittleInt(buffer, ref cursor);
-            ReservedValueInt = SpanHelper.ReadLittleInt(buffer, ref cursor);
-            // Is only present if ReservedHashInt is 8, I've only found cases of 0 or 8.
-            if (ReservedHashInt != 0) HashGuid.Deserialize(buffer, asset, ref cursor);
-
-            ValueGuid.Deserialize(buffer, asset, ref cursor);
-
-            // ReservedValueInt is 256 (0x100) when values are present, but 255 (0xFF) when not present. I've only found cases of 256 or 255.
-            if (ReservedValueInt != 0xFF)
+            SerializationFlags = SpanHelper.ReadLittleInt(buffer, ref cursor);
+            // Unknown3 and Flags are combined as an int32. There's an excess zero guid.
+            Flags = SpanHelper.ReadByte(buffer, ref cursor);
+            if (mode != SerializationMode.Normal || Tag?.Size > 5)
             {
-                Hash = ObjectSerializer.DeserializeString(buffer, ref cursor);
-                Value = ObjectSerializer.DeserializeString(buffer, ref cursor);
+                Unknown3 = SpanHelper.ReadLittleInt(buffer, ref cursor);
+#if DEBUG
+                Unknown3Set.Add(Unknown3);
+#endif
+                if (SerializationFlags != 0) ValueGuid.Deserialize(buffer, asset, ref cursor);
+                if (Flags != 0xFF)
+                {
+                    Hash = ObjectSerializer.DeserializeString(buffer, ref cursor);
+                    Value = ObjectSerializer.DeserializeString(buffer, ref cursor);
+                }
             }
         }
 
         public override void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor, SerializationMode mode)
         {
             base.Serialize(ref buffer, asset, ref cursor, mode);
-            SpanHelper.WriteLittleInt(ref buffer, ReservedHashInt, ref cursor);
-            SpanHelper.WriteLittleInt(ref buffer, ReservedValueInt, ref cursor);
-            if (ReservedHashInt != 0) HashGuid.Serialize(ref buffer, asset, ref cursor);
-            ValueGuid.Serialize(ref buffer, asset, ref cursor);
-
-            if (ReservedValueInt != 0xFF)
+            SpanHelper.WriteLittleInt(ref buffer, SerializationFlags, ref cursor);
+            SpanHelper.WriteByte(ref buffer, Flags, ref cursor);
+            if (mode != SerializationMode.Normal || Tag?.Size > 5)
             {
-                ObjectSerializer.SerializeString(ref buffer, Hash, ref cursor);
-                ObjectSerializer.SerializeString(ref buffer, Value, ref cursor);
+                SpanHelper.WriteLittleInt(ref buffer, Unknown3, ref cursor);
+                if (SerializationFlags != 0) ValueGuid.Serialize(ref buffer, asset, ref cursor);
+                if (Flags != 0xFF)
+                {
+                    ObjectSerializer.SerializeString(ref buffer, Hash, ref cursor);
+                    ObjectSerializer.SerializeString(ref buffer, Value, ref cursor);
+                }
             }
         }
     }
