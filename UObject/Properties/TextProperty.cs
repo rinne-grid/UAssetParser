@@ -12,12 +12,12 @@ namespace UObject.Properties
     [PublicAPI]
     public class TextProperty : AbstractGuidProperty, IValueType<string>
     {
+#if DEBUG
+        public static HashSet<int> Unknown3Set = new HashSet<int>();
+#endif
         public int SerializationFlags { get; set; }
         public byte Flags { get; set; }
         public int Unknown3 { get; set; }
-        #if DEBUG
-        public static HashSet<int> Unknown3Set = new HashSet<int>();
-        #endif
         public PropertyGuid ValueGuid { get; set; } = new PropertyGuid();
         public string Hash { get; set; } = "None";
         public string Value { get; set; } = "None";
@@ -28,6 +28,7 @@ namespace UObject.Properties
         {
             base.Deserialize(buffer, asset, ref cursor, mode);
             SerializationFlags = SpanHelper.ReadLittleInt(buffer, ref cursor);
+            Logger.Assert(SerializationFlags == 0 || SerializationFlags == 8, "SerializationFlags == 0 || SerializationFlags == 8", SerializationFlags.ToString());
             // Unknown3 and Flags are combined as an int32. There's an excess zero guid.
             Flags = SpanHelper.ReadByte(buffer, ref cursor);
             if (mode != SerializationMode.Normal || Tag?.Size > 5)
@@ -36,7 +37,7 @@ namespace UObject.Properties
 #if DEBUG
                 Unknown3Set.Add(Unknown3);
 #endif
-                if (SerializationFlags != 0) ValueGuid.Deserialize(buffer, asset, ref cursor);
+                if ((SerializationFlags & 8) == 8) ValueGuid.Deserialize(buffer, asset, ref cursor);
                 if (Flags != 0xFF)
                 {
                     Hash = ObjectSerializer.DeserializeString(buffer, ref cursor);
@@ -53,7 +54,7 @@ namespace UObject.Properties
             if (mode != SerializationMode.Normal || Tag?.Size > 5)
             {
                 SpanHelper.WriteLittleInt(ref buffer, Unknown3, ref cursor);
-                if (SerializationFlags != 0) ValueGuid.Serialize(ref buffer, asset, ref cursor);
+                if ((SerializationFlags & 8) == 8) ValueGuid.Serialize(ref buffer, asset, ref cursor);
                 if (Flags != 0xFF)
                 {
                     ObjectSerializer.SerializeString(ref buffer, Hash, ref cursor);
