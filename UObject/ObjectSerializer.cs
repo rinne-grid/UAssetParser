@@ -5,6 +5,7 @@ using System.Text;
 using DragonLib.IO;
 using JetBrains.Annotations;
 using UObject.Asset;
+using UObject.Enum;
 using UObject.Generics;
 using UObject.ObjectModel;
 using UObject.Properties;
@@ -22,10 +23,23 @@ namespace UObject
             { nameof(StructProperty), typeof(StructProperty) },
             { nameof(NameProperty), typeof(NameProperty) },
             { nameof(StrProperty), typeof(StrProperty) },
+            { nameof(TextProperty), typeof(TextProperty) },
             { nameof(ArrayProperty), typeof(ArrayProperty) },
+            { nameof(MapProperty), typeof(MapProperty) },
             { nameof(EnumProperty), typeof(EnumProperty) },
-            { nameof(IntProperty), typeof(IntProperty) },
+            { nameof(ByteProperty), typeof(ByteProperty) },
+            { "ShortProperty", typeof(Int16Property) },
+            { "UShortProperty", typeof(UInt16Property) },
+            { "IntProperty", typeof(Int32Property) },
+            { "UIntProperty", typeof(UInt32Property) },
+            { "LongProperty", typeof(Int64Property) },
+            { "ULongProperty", typeof(UInt64Property) },
+            { nameof(Int16Property), typeof(Int16Property) },
+            { nameof(UInt16Property), typeof(UInt16Property) },
+            { nameof(Int32Property), typeof(Int32Property) },
             { nameof(UInt32Property), typeof(UInt32Property) },
+            { nameof(Int64Property), typeof(Int64Property) },
+            { nameof(UInt64Property), typeof(UInt64Property) },
             { nameof(FloatProperty), typeof(FloatProperty) },
             { nameof(BoolProperty), typeof(BoolProperty) }
         };
@@ -36,7 +50,7 @@ namespace UObject
             { nameof(StringTable), typeof(StringTable) }
         };
 
-        public static AssetFile Deserialize(Span<byte> uasset, Span<byte> uexp) => new AssetFile(uasset, uexp);
+        public static AssetFile Deserialize(Span<byte> uasset, Span<byte> uexp, AssetFileOptions options) => new AssetFile(uasset, uexp, options);
 
         public static Span<byte> SerializeExports(ref PackageFileSummary summary, List<UnrealObject> uexp) => throw new NotImplementedException();
 
@@ -67,10 +81,10 @@ namespace UObject
             tag.Deserialize(buffer, asset, ref cursor);
             var tmp = cursor;
             cursor = start;
-            return DeserializeProperty(buffer, asset, tag, tag.Type, tmp, ref cursor, false);
+            return DeserializeProperty(buffer, asset, tag, tag.Type, tmp, ref cursor, SerializationMode.Normal);
         }
 
-        public static AbstractProperty DeserializeProperty(Span<byte> buffer, AssetFile asset, PropertyTag tag, Name serializationType, int offset, ref int cursor, bool ignore)
+        public static AbstractProperty DeserializeProperty(Span<byte> buffer, AssetFile asset, PropertyTag tag, Name serializationType, int offset, ref int cursor, SerializationMode mode)
         {
             if (serializationType == null) throw new InvalidDataException();
             if (!PropertyTypes.TryGetValue(serializationType, out var propertyType))
@@ -80,7 +94,7 @@ namespace UObject
             }
 
             if (!(Activator.CreateInstance(propertyType) is AbstractProperty instance)) throw new InvalidDataException();
-            instance.Deserialize(buffer, asset, ref cursor, ignore);
+            instance.Deserialize(buffer, asset, ref cursor, mode);
             return instance;
         }
 
@@ -136,13 +150,13 @@ namespace UObject
 
         public static ISerializableObject DeserializeObject(AssetFile asset, ObjectExport export, Span<byte> uasset, Span<byte> uexp)
         {
-            var blob = uexp.Length > 0 ? uexp.Slice((int) (export.SerialOffset - asset.Summary.TotalHeaderSize), (int) export.SerialSize) : uasset.Slice((int) export.SerialOffset, (int) export.SerialSize);
+            var blob = uexp.Length > 0 ? uexp : uasset;
 
             if (!ClassTypes.TryGetValue(export.ClassIndex.Name ?? "None", out var classType)) throw new NotImplementedException(export.ClassIndex.Name);
 
             if (!(Activator.CreateInstance(classType) is ISerializableObject instance)) throw new NotImplementedException(export.ClassIndex.Name);
 
-            var cursor = 0;
+            var cursor = (int) (uexp.Length > 0 ? export.SerialOffset - asset.Summary.TotalHeaderSize : export.SerialOffset);
             instance.Deserialize(blob, asset, ref cursor);
             return instance;
         }

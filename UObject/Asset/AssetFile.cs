@@ -9,11 +9,13 @@ namespace UObject.Asset
     [PublicAPI]
     public class AssetFile
     {
-        public AssetFile(Span<byte> uasset, Span<byte> uexp, int unrealVersion = 524)
+        public AssetFile(Span<byte> uasset, Span<byte> uexp, AssetFileOptions options)
         {
+            Options = options;
+
             var cursor = 0;
             Summary = new PackageFileSummary();
-            Summary.Deserialize(uasset, this, unrealVersion, ref cursor);
+            Summary.Deserialize(uasset, this, options, ref cursor);
 
             cursor = Summary.NameOffset;
             Names = ObjectSerializer.DeserializeProperties<NameEntry>(uasset, this, Summary.NameCount, ref cursor);
@@ -30,6 +32,8 @@ namespace UObject.Asset
         }
 
         public AssetFile() { }
+
+        public AssetFileOptions Options { get; set; }
 
         public PackageFileSummary Summary { get; set; } = new PackageFileSummary();
         public NameEntry[] Names { get; set; } = new NameEntry[0];

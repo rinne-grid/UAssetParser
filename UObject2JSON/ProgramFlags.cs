@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using DragonLib.CLI;
 using JetBrains.Annotations;
+using UObject.Asset;
+using UObject.Enum;
 
 namespace UObject2JSON
 {
@@ -13,5 +15,14 @@ namespace UObject2JSON
 
         [CLIFlag("output", Aliases = new[] { "o" }, Category = "Program Arguments", Help = "Folder to output JSON files to")]
         public string? OutputFolder { get; set; }
+
+        [CLIFlag("workaround", Default = UnrealGame.None, Aliases = new[] { "w" }, Category = "Program Arguments", Help = "Game-specific workaround")]
+        public UnrealGame Workaround { get; set; }
+
+        [CLIFlag("changeset", Default = AssetFileOptions.LATEST_UNREAL_VERSION, Aliases = new[] { "c" }, Category = "Program Arguments", Help = "Unreal changeset to parse with if unspecified by the asset")]
+        public int UnrealVersion { get; set; }
+
+        [CLIFlag("typeless", Default = false, Aliases = new[] { "t" }, Category = "Program Arguments", Help = "Do not store type information")]
+        public bool Typeless { get; set; }
     }
 }

@@ -14,7 +14,9 @@ namespace UObject.Generics
 
         public void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor)
         {
-            var hasGuid = SpanHelper.ReadByte(buffer, ref cursor) == 1;
+            var boolByte = SpanHelper.ReadByte(buffer, ref cursor);
+            Logger.Assert(boolByte <= 1, "boolByte <= 1");
+            var hasGuid = boolByte == 1;
             if (hasGuid) Guid = SpanHelper.ReadStruct<Guid>(buffer, ref cursor);
         }
 

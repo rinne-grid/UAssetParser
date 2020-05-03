@@ -1,32 +1,31 @@
 ﻿using System;
-using System.Text.Json.Serialization;
+using System.Globalization;
 using DragonLib.IO;
 using JetBrains.Annotations;
 using UObject.Asset;
-using UObject.Generics;
+using UObject.Enum;
+using UObject.JSON;
 
 namespace UObject.Properties
 {
+    // TODO: Validate if GUID is BEFORE or AFTER Value.
     [PublicAPI]
-    public class FloatProperty : AbstractProperty
+    public class FloatProperty : AbstractGuidProperty, IValueType<float>
     {
-        [JsonIgnore]
-        public PropertyGuid Guid { get; set; } = new PropertyGuid();
-
         public float Value { get; set; }
 
-        public override void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor)
+        public override string ToString() => Value.ToString(CultureInfo.InvariantCulture);
+
+        public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor, SerializationMode mode)
         {
-            base.Serialize(ref buffer, asset, ref cursor);
-            SpanHelper.WriteLittleSingle(ref buffer, Value, ref cursor);
-            Guid.Serialize(ref buffer, asset, ref cursor);
+            base.Deserialize(buffer, asset, ref cursor, mode);
+            Value = SpanHelper.ReadLittleSingle(buffer, ref cursor);
         }
 
-        public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor, bool ignoreTag)
+        public override void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor, SerializationMode mode)
         {
-            base.Deserialize(buffer, asset, ref cursor, ignoreTag);
-            Value = SpanHelper.ReadLittleSingle(buffer, ref cursor);
-            if (!ignoreTag) Guid.Deserialize(buffer, asset, ref cursor);
+            base.Serialize(ref buffer, asset, ref cursor, mode);
+            SpanHelper.WriteLittleSingle(ref buffer, Value, ref cursor);
         }
     }
 }

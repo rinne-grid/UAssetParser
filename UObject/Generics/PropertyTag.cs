@@ -22,5 +22,7 @@ namespace UObject.Generics
         }
 
         public virtual void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor) => throw new NotImplementedException();
+
+        public override string ToString() => $"<{Type}> {Name}";
     }
 }

@@ -8,14 +8,16 @@ using UObject.Generics;
 namespace UObject.ObjectModel
 {
     [PublicAPI]
-    public class DataTable : UnrealObject
+    public class DataTable : ISerializableObject
     {
-        public Dictionary<string, UnrealObject> Table { get; set; } = new Dictionary<string, UnrealObject>();
+        public Dictionary<string, UnrealObject> Data { get; set; } = new Dictionary<string, UnrealObject>();
+        public int Reserved { get; set; }
+        public UnrealObject ExportData { get; set; } = new UnrealObject();
 
-        public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor)
+        public void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor)
         {
-            base.Deserialize(buffer, asset, ref cursor);
-            cursor += 4;
+            ExportData.Deserialize(buffer, asset, ref cursor);
+            Reserved = SpanHelper.ReadLittleInt(buffer, ref cursor);
             var count = SpanHelper.ReadLittleInt(buffer, ref cursor);
             for (var i = 0; i < count; ++i)
             {
@@ -23,10 +25,10 @@ namespace UObject.ObjectModel
                 key.Deserialize(buffer, asset, ref cursor);
                 var data = new UnrealObject();
                 data.Deserialize(buffer, asset, ref cursor);
-                Table[key] = data;
+                Data[key] = data;
             }
         }
 
-        public override void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor) => throw new NotImplementedException();
+        public void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor) => throw new NotImplementedException();
     }
 }

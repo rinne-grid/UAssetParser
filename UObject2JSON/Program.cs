@@ -1,11 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using DragonLib.CLI;
 using DragonLib.IO;
 using DragonLib.JSON;
 using JetBrains.Annotations;
 using UObject;
+using UObject.Asset;
+using UObject.JSON;
 
 namespace UObject2JSON
 {
@@ -26,21 +30,32 @@ namespace UObject2JSON
                 else if (File.Exists(path)) paths.Add(path);
             }
 
+            var settings = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                Converters =
+                {
+                    flags.Typeless ? (JsonConverter) new GenericTypelessDictionaryConverterFactory() : new GenericDictionaryConverterFactory(),
+                    flags.Typeless ? (JsonConverter) new GenericTypelessListConverterFactory() : new GenericListConverterFactory(),
+                    new ValueTypeConverterFactory(flags.Typeless),
+                    new UnrealObjectConverter(),
+                    new NoneStringConverter()
+                }
+            };
+
+            var options = new AssetFileOptions
+            {
+                UnrealVersion = flags.UnrealVersion,
+                Workaround = flags.Workaround
+            };
+
             foreach (var path in paths)
             {
                 var arg = Path.Combine(Path.GetDirectoryName(path) ?? ".", Path.GetFileNameWithoutExtension(path));
                 var uasset = File.ReadAllBytes(arg + ".uasset");
-                var uexp = File.ReadAllBytes(arg + ".uexp");
+                var uexp = File.Exists(arg + ".uexp") ? File.ReadAllBytes(arg + ".uexp") : Span<byte>.Empty;
                 Logger.Info("UAsset", arg);
-                var json = JsonSerializer.Serialize(ObjectSerializer.Deserialize(uasset, uexp).ExportObjects, new JsonSerializerOptions
-                {
-                    WriteIndented = true,
-                    Converters =
-                    {
-                        new GenericDictionaryConverterFactory(),
-                        new GenericListConverterFactory()
-                    }
-                });
+                var json = JsonSerializer.Serialize(ObjectSerializer.Deserialize(uasset, uexp, options).ExportObjects, settings);
 
                 if (!string.IsNullOrWhiteSpace(flags.OutputFolder))
                 {

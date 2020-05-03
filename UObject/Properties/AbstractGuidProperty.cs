@@ -7,7 +7,7 @@ using UObject.Generics;
 namespace UObject.Properties
 {
     [PublicAPI]
-    public class AbstractGuidProperty : AbstractProperty
+    public abstract class AbstractGuidProperty : AbstractProperty
     {
         [JsonIgnore]
         public PropertyGuid Guid => (Tag as PropertyGuidTag)?.Guid ?? new PropertyGuid();
