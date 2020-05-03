@@ -21,14 +21,14 @@ namespace UObject.Properties
 
         public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor, SerializationMode mode)
         {
-            base.Deserialize(buffer, asset, ref cursor, mode);
             if (mode == SerializationMode.Normal)
             {
+                base.Deserialize(buffer, asset, ref cursor, mode);
                 EnumName.Deserialize(buffer, asset, ref cursor);
                 Guid.Deserialize(buffer, asset, ref cursor);
             }
 
-            if (mode == SerializationMode.Normal && EnumName.Value == "None" || mode.HasFlag(SerializationMode.ByteAsEnum))
+            if ((mode == SerializationMode.Normal && EnumName.Value == "None") || mode == SerializationMode.PureByteArray)
             {
                 Value = SpanHelper.ReadByte(buffer, ref cursor);
             }

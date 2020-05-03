@@ -22,10 +22,14 @@ namespace UObject.Properties
 
         public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor, SerializationMode mode)
         {
+            
             Logger.Assert(mode == SerializationMode.Normal, "mode == SerializationMode.Normal");
             base.Deserialize(buffer, asset, ref cursor, mode);
             ArrayType.Deserialize(buffer, asset, ref cursor);
             Guid.Deserialize(buffer, asset, ref cursor);
+            #if DEBUG
+            var start = cursor;
+            #endif
             var count = SpanHelper.ReadLittleInt(buffer, ref cursor);
             if (ArrayType == "StructProperty")
             {
@@ -37,9 +41,13 @@ namespace UObject.Properties
             else
             {
                 var arrayMode = SerializationMode.Array;
-                if (ArrayType == "ByteProperty" && Tag?.Size > 0 && Tag?.Size / count != 1) arrayMode &= SerializationMode.ByteAsEnum;
+                if (ArrayType == "ByteProperty" && Tag?.Size > 0 && (Tag?.Size - 4) / count == 1) arrayMode = SerializationMode.PureByteArray;
                 for (var i = 0; i < count; ++i) Value.Add(ObjectSerializer.DeserializeProperty(buffer, asset, Tag ?? new PropertyTag(), ArrayType, cursor, ref cursor, arrayMode));
             }
+            #if DEBUG
+            if (ArrayType != "StructProperty" && cursor != (start + Tag?.Size))
+                throw new InvalidOperationException("ARRAY SIZE OFFSHOOT");
+            #endif
         }
 
         public override void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor, SerializationMode mode)
