@@ -60,9 +60,16 @@ namespace UObject.Properties
             base.Serialize(ref buffer, asset, ref cursor, mode);
             ArrayType.Serialize(ref buffer, asset, ref cursor);
             Guid.Serialize(ref buffer, asset, ref cursor);
-            if (Value is List<object?> list)
-                SpanHelper.WriteLittleInt(ref buffer, list.Count, ref cursor);
-            else if (Value is StructProperty structProperty && structProperty.Value is List<object?> structList) SpanHelper.WriteLittleInt(ref buffer, structList.Count, ref cursor);
+            switch (Value)
+            {
+                case List<object?> list:
+                    SpanHelper.WriteLittleInt(ref buffer, list.Count, ref cursor);
+                    break;
+                case StructProperty structProperty when structProperty.Value is List<object?> structList:
+                    SpanHelper.WriteLittleInt(ref buffer, structList.Count, ref cursor);
+                    break;
+                default: throw new NotSupportedException(Value?.GetType().FullName);
+            }
 
             // TODO: Serialize struct data
         }

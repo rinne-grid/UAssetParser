@@ -37,7 +37,7 @@ namespace UObject.Asset
         public EngineVersion CompatibleWithEngineVersion { get; set; }
         public CompressedChunk[] CompressedChunks { get; set; } = new CompressedChunk[0];
         public uint PackageSource { get; set; }
-        public string[] AdditionalPackagesToCook { get; set; } = new string[0];
+        public string?[] AdditionalPackagesToCook { get; set; } = new string[0];
         public int NumTextureAllocations { get; set; }
         public int AssetRegistryDataOffset { get; set; }
         public long BulkDataStartOffset { get; set; }
@@ -156,7 +156,7 @@ namespace UObject.Asset
             SpanHelper.WriteStructArray(ref buffer, CompressedChunks, ref cursor);
             SpanHelper.WriteLittleUInt(ref buffer, PackageSource, ref cursor);
             SpanHelper.WriteLittleInt(ref buffer, AdditionalPackagesToCook.Length, ref cursor);
-            foreach (var additionalPackage in AdditionalPackagesToCook) ObjectSerializer.SerializeString(ref buffer, additionalPackage, ref cursor);
+            foreach (var additionalPackage in AdditionalPackagesToCook) ObjectSerializer.SerializeString(ref buffer, additionalPackage ?? "None", ref cursor);
             if (LegacyFileVersion > -7) SpanHelper.WriteLittleInt(ref buffer, NumTextureAllocations, ref cursor);
 
             SpanHelper.WriteLittleInt(ref buffer, AssetRegistryDataOffset, ref cursor);

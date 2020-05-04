@@ -12,7 +12,7 @@ namespace UObject.ObjectModel
     {
         public string? Name { get; set; }
         public int Reserved { get; set; }
-        public Dictionary<string, string> Data { get; set; } = new Dictionary<string, string>();
+        public Dictionary<string, string?> Data { get; set; } = new Dictionary<string, string?>();
         public UnrealObject ExportData { get; set; } = new UnrealObject();
 
         public void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor)
@@ -21,7 +21,7 @@ namespace UObject.ObjectModel
             Reserved = SpanHelper.ReadLittleInt(buffer, ref cursor);
             Name = ObjectSerializer.DeserializeString(buffer, ref cursor);
             var count = SpanHelper.ReadLittleInt(buffer, ref cursor);
-            for (var i = 0; i < count; ++i) Data.Add(ObjectSerializer.DeserializeString(buffer, ref cursor), ObjectSerializer.DeserializeString(buffer, ref cursor));
+            for (var i = 0; i < count; ++i) Data.Add(ObjectSerializer.DeserializeString(buffer, ref cursor) ?? $"{cursor:X}", ObjectSerializer.DeserializeString(buffer, ref cursor));
         }
 
         public void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor) => throw new NotImplementedException();
