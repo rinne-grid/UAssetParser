@@ -1,0 +1,33 @@
+version: '1.0.{build}'
+dotnet_csproj:
+  patch: true
+  file: '**\*.csproj'
+  version: '{version}'
+  assembly_version: '{version}'
+  file_version: '{version}'
+  informational_version: '{build}'
+image: Visual Studio 2019
+branches:
+  only:
+  - core
+before_build:
+  - cmd: git submodule update --init --recursive
+  - cmd: dotnet --version
+  - cmd: dotnet restore UObject.sln --verbosity m
+build_script:
+  - cmd: dotnet publish --configuration Release --self-contained -r win10-x64 -o dist/UObjectStandalone
+  - cmd: dotnet publish --configuration Release /p:PublishTrimmed=false -o dist/UObjectRuntime
+  - cmd: dotnet publish --configuration Debug /p:PublishTrimmed=false -o dist/UObjectDebug
+on_success:
+  - cmd: del dist\UObjectStandalone\*.json
+  - cmd: del dist\UObjectRuntime\*.json
+  - cmd: del dist\UObjectDebug\*.json
+clone_depth: 3
+deploy: off
+artifacts:
+- path: dist/UObjectStandalone
+  name: UObjectStandalone_netcore31
+- path: dist/UObjectRuntime
+  name: UObjectRuntime_netcore31
+- path: dist/UObjectDebug
+  name: UObjectDebug_netcore31
