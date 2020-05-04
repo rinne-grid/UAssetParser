@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.Json.Serialization;
 using DragonLib.IO;
 using JetBrains.Annotations;
@@ -11,43 +12,46 @@ using UObject.JSON;
 namespace UObject.Properties
 {
     [PublicAPI]
-    public class ArrayProperty : AbstractProperty, IArrayValueType<List<object?>>
+    public class ArrayProperty : AbstractProperty, IArrayValueType<object?>
     {
         public Name ArrayType { get; set; } = new Name();
 
         [JsonIgnore]
         public PropertyGuid Guid { get; set; } = new PropertyGuid();
 
-        public List<object?> Value { get; set; } = new List<object?>();
+        public object? Value { get; set; }
 
         public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor, SerializationMode mode)
         {
-            
             Logger.Assert(mode == SerializationMode.Normal, "mode == SerializationMode.Normal");
             base.Deserialize(buffer, asset, ref cursor, mode);
             ArrayType.Deserialize(buffer, asset, ref cursor);
             Guid.Deserialize(buffer, asset, ref cursor);
-            #if DEBUG
+#if DEBUG
             var start = cursor;
-            #endif
+#endif
             var count = SpanHelper.ReadLittleInt(buffer, ref cursor);
+            var value = new List<object?>();
             if (ArrayType == "StructProperty")
             {
                 var structTag = new PropertyTag();
                 structTag.Deserialize(buffer, asset, ref cursor);
-                var structProperty = ObjectSerializer.DeserializeProperty(buffer, asset, structTag, ArrayType, cursor, ref cursor, SerializationMode.Array) as StructProperty;
-                for (var i = 0; i < count; ++i) Value.Add(ObjectSerializer.DeserializeStruct(buffer, asset, structProperty?.StructName ?? "None", ref cursor));
+                var structProperty = ObjectSerializer.DeserializeProperty(buffer, asset, structTag, ArrayType, cursor, ref cursor, SerializationMode.Array) as StructProperty ?? throw new InvalidDataException();
+                for (var i = 0; i < count; ++i) value.Add(ObjectSerializer.DeserializeStruct(buffer, asset, structProperty?.StructName! ?? "None", ref cursor));
+                structProperty!.Value = value;
+                Value = structProperty;
             }
             else
             {
                 var arrayMode = SerializationMode.Array;
-                if (ArrayType == "ByteProperty" && Tag?.Size > 0 && (Tag?.Size - 4) / count == 1) arrayMode = SerializationMode.PureByteArray;
-                for (var i = 0; i < count; ++i) Value.Add(ObjectSerializer.DeserializeProperty(buffer, asset, Tag ?? new PropertyTag(), ArrayType, cursor, ref cursor, arrayMode));
+                if (ArrayType == "ByteProperty" && Tag?.Size > 0 && (Tag?.Size - 4) / count == 1) arrayMode &= SerializationMode.PureByteArray;
+                for (var i = 0; i < count; ++i) value.Add(ObjectSerializer.DeserializeProperty(buffer, asset, Tag ?? new PropertyTag(), ArrayType, cursor, ref cursor, arrayMode));
+                Value = value;
             }
-            #if DEBUG
-            if (ArrayType != "StructProperty" && cursor != (start + Tag?.Size))
+#if DEBUG
+            if (ArrayType != "StructProperty" && cursor != start + Tag?.Size)
                 throw new InvalidOperationException("ARRAY SIZE OFFSHOOT");
-            #endif
+#endif
         }
 
         public override void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor, SerializationMode mode)
@@ -56,7 +60,10 @@ namespace UObject.Properties
             base.Serialize(ref buffer, asset, ref cursor, mode);
             ArrayType.Serialize(ref buffer, asset, ref cursor);
             Guid.Serialize(ref buffer, asset, ref cursor);
-            SpanHelper.WriteLittleInt(ref buffer, Value.Count, ref cursor);
+            if (Value is List<object?> list)
+                SpanHelper.WriteLittleInt(ref buffer, list.Count, ref cursor);
+            else if (Value is StructProperty structProperty && structProperty.Value is List<object?> structList) SpanHelper.WriteLittleInt(ref buffer, structList.Count, ref cursor);
+
             // TODO: Serialize struct data
         }
     }

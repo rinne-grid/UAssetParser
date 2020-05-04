@@ -15,7 +15,7 @@ namespace UObject.Asset
         public int FileVersionLicenseeUE4 { get; set; }
         public CustomVersion[] CustomVersion { get; set; } = new CustomVersion[0];
         public int TotalHeaderSize { get; set; }
-        public string FolderName { get; set; } = "None";
+        public string? FolderName { get; set; }
         public uint PackageFlags { get; set; }
         public int NameCount { get; set; }
         public int NameOffset { get; set; }
@@ -128,7 +128,7 @@ namespace UObject.Asset
             }
 
             SpanHelper.WriteLittleInt(ref buffer, TotalHeaderSize, ref cursor);
-            ObjectSerializer.SerializeString(ref buffer, FolderName, ref cursor);
+            ObjectSerializer.SerializeString(ref buffer, FolderName ?? "None", ref cursor);
             SpanHelper.WriteLittleUInt(ref buffer, PackageFlags, ref cursor);
             SpanHelper.WriteLittleInt(ref buffer, NameCount, ref cursor);
             SpanHelper.WriteLittleInt(ref buffer, NameOffset, ref cursor);

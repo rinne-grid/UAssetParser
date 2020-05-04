@@ -10,7 +10,7 @@ using UObject.JSON;
 namespace UObject.Properties
 {
     [PublicAPI]
-    public class TextProperty : AbstractGuidProperty, IValueType<string>
+    public class TextProperty : AbstractGuidProperty, IValueType<string?>
     {
 #if DEBUG
         public static HashSet<int> Unknown3Set = new HashSet<int>();
@@ -19,10 +19,10 @@ namespace UObject.Properties
         public byte Flags { get; set; }
         public int Unknown3 { get; set; }
         public PropertyGuid ValueGuid { get; set; } = new PropertyGuid();
-        public string Hash { get; set; } = "None";
-        public string Value { get; set; } = "None";
+        public string? Hash { get; set; }
+        public string? Value { get; set; }
 
-        public override string ToString() => Value;
+        public override string? ToString() => Value;
 
         public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor, SerializationMode mode)
         {
@@ -57,8 +57,8 @@ namespace UObject.Properties
                 if ((SerializationFlags & 8) == 8) ValueGuid.Serialize(ref buffer, asset, ref cursor);
                 if (Flags != 0xFF)
                 {
-                    ObjectSerializer.SerializeString(ref buffer, Hash, ref cursor);
-                    ObjectSerializer.SerializeString(ref buffer, Value, ref cursor);
+                    ObjectSerializer.SerializeString(ref buffer, Hash ?? "None", ref cursor);
+                    ObjectSerializer.SerializeString(ref buffer, Value ?? "None", ref cursor);
                 }
             }
         }

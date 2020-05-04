@@ -9,5 +9,6 @@ namespace UObject.Asset
         public const int LATEST_UNREAL_VERSION = 524;
         public int UnrealVersion { get; set; } = LATEST_UNREAL_VERSION;
         public UnrealGame Workaround { get; set; } = UnrealGame.None;
+        public bool Dry { get; set; }
     }
 }
