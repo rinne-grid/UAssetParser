@@ -21,9 +21,9 @@ namespace UObject.Properties
 
         public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor, SerializationMode mode)
         {
+            base.Deserialize(buffer, asset, ref cursor, mode);
             if (mode == SerializationMode.Normal)
             {
-                base.Deserialize(buffer, asset, ref cursor, mode);
                 EnumName.Deserialize(buffer, asset, ref cursor);
                 Guid.Deserialize(buffer, asset, ref cursor);
             }
@@ -41,9 +41,9 @@ namespace UObject.Properties
 
         public override void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor, SerializationMode mode)
         {
-            base.Serialize(ref buffer, asset, ref cursor);
             if (mode == SerializationMode.Normal)
             {
+                base.Serialize(ref buffer, asset, ref cursor);
                 EnumName.Serialize(ref buffer, asset, ref cursor);
                 Guid.Serialize(ref buffer, asset, ref cursor);
             }
