@@ -56,10 +56,10 @@ namespace UObject
 
         public static Span<byte> SerializeSummary(PackageFileSummary summary, List<UnrealObject> uasset) => throw new NotImplementedException();
 
-        public static string DeserializeString(Span<byte> buffer, ref int cursor)
+        public static string? DeserializeString(Span<byte> buffer, ref int cursor)
         {
             var count = SpanHelper.ReadLittleInt(buffer, ref cursor);
-            var str = "None";
+            var str = default(string);
             if (count > 0)
             {
                 str = count == 1 ? string.Empty : Encoding.UTF8.GetString(buffer.Slice(cursor, count - 1));
@@ -190,5 +190,7 @@ namespace UObject
                 }
             }
         }
+
+        public static bool IsSupported(ObjectExport export) => ClassTypes.ContainsKey(export.ClassIndex.Name ?? "None");
     }
 }

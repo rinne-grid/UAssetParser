@@ -24,5 +24,11 @@ namespace UObject2JSON
 
         [CLIFlag("typeless", Default = false, Aliases = new[] { "t" }, Category = "Program Arguments", Help = "Do not store type information")]
         public bool Typeless { get; set; }
+
+        [CLIFlag("dry", Default = false, Aliases = new[] { "n" }, Category = "Program Arguments", Help = "Only parse asset information, not actual serial info")]
+        public bool Dry { get; set; }
+
+        [CLIFlag("quiet", Default = false, Aliases = new[] { "q" }, Category = "Program Arguments", Help = "Suppress output messages")]
+        public bool Quiet { get; set; }
     }
 }

@@ -15,7 +15,7 @@ namespace UObject.Asset
         public int FileVersionLicenseeUE4 { get; set; }
         public CustomVersion[] CustomVersion { get; set; } = new CustomVersion[0];
         public int TotalHeaderSize { get; set; }
-        public string FolderName { get; set; } = "None";
+        public string? FolderName { get; set; }
         public uint PackageFlags { get; set; }
         public int NameCount { get; set; }
         public int NameOffset { get; set; }
@@ -37,7 +37,7 @@ namespace UObject.Asset
         public EngineVersion CompatibleWithEngineVersion { get; set; }
         public CompressedChunk[] CompressedChunks { get; set; } = new CompressedChunk[0];
         public uint PackageSource { get; set; }
-        public string[] AdditionalPackagesToCook { get; set; } = new string[0];
+        public string?[] AdditionalPackagesToCook { get; set; } = new string[0];
         public int NumTextureAllocations { get; set; }
         public int AssetRegistryDataOffset { get; set; }
         public long BulkDataStartOffset { get; set; }
@@ -128,7 +128,7 @@ namespace UObject.Asset
             }
 
             SpanHelper.WriteLittleInt(ref buffer, TotalHeaderSize, ref cursor);
-            ObjectSerializer.SerializeString(ref buffer, FolderName, ref cursor);
+            ObjectSerializer.SerializeString(ref buffer, FolderName ?? "None", ref cursor);
             SpanHelper.WriteLittleUInt(ref buffer, PackageFlags, ref cursor);
             SpanHelper.WriteLittleInt(ref buffer, NameCount, ref cursor);
             SpanHelper.WriteLittleInt(ref buffer, NameOffset, ref cursor);
@@ -156,7 +156,7 @@ namespace UObject.Asset
             SpanHelper.WriteStructArray(ref buffer, CompressedChunks, ref cursor);
             SpanHelper.WriteLittleUInt(ref buffer, PackageSource, ref cursor);
             SpanHelper.WriteLittleInt(ref buffer, AdditionalPackagesToCook.Length, ref cursor);
-            foreach (var additionalPackage in AdditionalPackagesToCook) ObjectSerializer.SerializeString(ref buffer, additionalPackage, ref cursor);
+            foreach (var additionalPackage in AdditionalPackagesToCook) ObjectSerializer.SerializeString(ref buffer, additionalPackage ?? "None", ref cursor);
             if (LegacyFileVersion > -7) SpanHelper.WriteLittleInt(ref buffer, NumTextureAllocations, ref cursor);
 
             SpanHelper.WriteLittleInt(ref buffer, AssetRegistryDataOffset, ref cursor);

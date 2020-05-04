@@ -8,7 +8,7 @@ using UObject.JSON;
 namespace UObject.Generics
 {
     [PublicAPI]
-    public class Name : ISerializableObject, IValueType<string>
+    public class Name : ISerializableObject, IValueType<string?>
     {
         [JsonIgnore]
         public int Index { get; set; }
@@ -31,10 +31,10 @@ namespace UObject.Generics
             // TODO: Recalculate Index.
         }
 
-        public string Value { get; set; } = "None";
+        public string? Value { get; set; }
 
         public static implicit operator string(Name? name) => name?.Value ?? "None";
 
-        public override string ToString() => Value;
+        public override string? ToString() => Value;
     }
 }

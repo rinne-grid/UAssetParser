@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using DragonLib.CLI;
@@ -16,11 +17,19 @@ namespace UObject2JSON
     [PublicAPI]
     internal class Program
     {
-        private static void Main(string[] args)
+        public enum ErrorCodes
+        {
+            Success = 0,
+            Crash = 1,
+            FlagError = -1,
+            NotSupported = 2
+        }
+
+        private static int Main(string[] args)
         {
             Logger.PrintVersion("UAsset");
             var flags = CommandLineFlags.ParseFlags<ProgramFlags>(CommandLineFlags.PrintHelp, args);
-            if (flags == null) return;
+            if (flags == null) return (int) ErrorCodes.FlagError;
             var paths = new List<string>();
             // TODO: Move to DragonLib
             foreach (var path in flags.Paths)
@@ -32,7 +41,7 @@ namespace UObject2JSON
 
             var settings = new JsonSerializerOptions
             {
-                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
                 WriteIndented = true,
                 Converters =
                 {
@@ -47,7 +56,8 @@ namespace UObject2JSON
             var options = new AssetFileOptions
             {
                 UnrealVersion = flags.UnrealVersion,
-                Workaround = flags.Workaround
+                Workaround = flags.Workaround,
+                Dry = flags.Dry
             };
 
             foreach (var path in paths)
@@ -55,17 +65,34 @@ namespace UObject2JSON
                 var arg = Path.Combine(Path.GetDirectoryName(path) ?? ".", Path.GetFileNameWithoutExtension(path));
                 var uasset = File.ReadAllBytes(arg + ".uasset");
                 var uexp = File.Exists(arg + ".uexp") ? File.ReadAllBytes(arg + ".uexp") : Span<byte>.Empty;
-                Logger.Info("UAsset", arg);
-                var json = JsonSerializer.Serialize(ObjectSerializer.Deserialize(uasset, uexp, options).ExportObjects, settings);
-
-                if (!string.IsNullOrWhiteSpace(flags.OutputFolder))
+                if (!flags.Quiet) Logger.Info("UAsset", arg);
+                try
                 {
-                    arg = Path.Combine(flags.OutputFolder, Path.GetFileName(arg));
-                    if (!Directory.Exists(flags.OutputFolder)) Directory.CreateDirectory(flags.OutputFolder);
-                }
+                    var asset = ObjectSerializer.Deserialize(uasset, uexp, options);
+                    if (flags.Dry)
+                    {
+                        if (!asset.IsSupported) return (int) ErrorCodes.NotSupported;
+                        continue;
+                    }
 
-                File.WriteAllText(arg + ".json", json);
+                    var json = JsonSerializer.Serialize(asset.ExportObjects, settings);
+
+                    if (!string.IsNullOrWhiteSpace(flags.OutputFolder))
+                    {
+                        arg = Path.Combine(flags.OutputFolder, Path.GetFileName(arg));
+                        if (!Directory.Exists(flags.OutputFolder)) Directory.CreateDirectory(flags.OutputFolder);
+                    }
+
+                    File.WriteAllText(arg + ".json", json);
+                }
+                catch (Exception e)
+                {
+                    Logger.Fatal("UAsset", e);
+                    return (int) ErrorCodes.Crash;
+                }
             }
+
+            return (int) ErrorCodes.Success;
         }
     }
 }

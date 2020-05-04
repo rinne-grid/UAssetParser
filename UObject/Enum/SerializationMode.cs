@@ -11,6 +11,6 @@ namespace UObject.Enum
         Array = 1 << 0,
         Map = 1 << 1,
         ByteAsEnum = 1 << 2,
-        PureByteArray
+        PureByteArray = 1 << 3
     }
 }

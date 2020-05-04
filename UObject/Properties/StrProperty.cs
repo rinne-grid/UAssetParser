@@ -7,11 +7,11 @@ using UObject.JSON;
 namespace UObject.Properties
 {
     [PublicAPI]
-    public class StrProperty : AbstractGuidProperty, IValueType<string>
+    public class StrProperty : AbstractGuidProperty, IValueType<string?>
     {
-        public string Value { get; set; } = "None";
+        public string? Value { get; set; }
 
-        public override string ToString() => Value;
+        public override string? ToString() => Value;
 
         public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor, SerializationMode mode)
         {
@@ -22,7 +22,7 @@ namespace UObject.Properties
         public override void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor, SerializationMode mode)
         {
             base.Serialize(ref buffer, asset, ref cursor, mode);
-            ObjectSerializer.SerializeString(ref buffer, Value, ref cursor);
+            ObjectSerializer.SerializeString(ref buffer, Value ?? "None", ref cursor);
         }
     }
 }

@@ -11,7 +11,7 @@ namespace UObject.Properties
     {
         public Name Package { get; set; } = new Name();
 
-        public string Path { get; set; } = "None";
+        public string? Path { get; set; }
 
         public override void Deserialize(Span<byte> buffer, AssetFile asset, ref int cursor, SerializationMode mode)
         {
@@ -24,7 +24,7 @@ namespace UObject.Properties
         {
             base.Serialize(ref buffer, asset, ref cursor, mode);
             Package.Serialize(ref buffer, asset, ref cursor);
-            ObjectSerializer.SerializeString(ref buffer, Path, ref cursor);
+            ObjectSerializer.SerializeString(ref buffer, Path ?? "None", ref cursor);
         }
     }
 }
