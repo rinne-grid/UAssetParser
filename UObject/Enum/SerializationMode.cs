@@ -10,6 +10,7 @@ namespace UObject.Enum
         Normal = 0,
         Array = 1 << 0,
         Map = 1 << 1,
-        ByteAsEnum = 1 << 2
+        ByteAsEnum = 1 << 2,
+        PureByteArray
     }
 }

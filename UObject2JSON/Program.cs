@@ -32,6 +32,7 @@ namespace UObject2JSON
 
             var settings = new JsonSerializerOptions
             {
+                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
                 WriteIndented = true,
                 Converters =
                 {

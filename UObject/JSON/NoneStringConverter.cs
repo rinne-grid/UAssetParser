@@ -20,7 +20,7 @@ namespace UObject.JSON
         public override void Write(Utf8JsonWriter writer, string value, JsonSerializerOptions options)
         {
             if (value == "None" || value == null) writer.WriteNullValue();
-            else writer.WriteStringValue(value.ToCharArray());
+            else writer.WriteStringValue(value.AsSpan());
         }
     }
 }

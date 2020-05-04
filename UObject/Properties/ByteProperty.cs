@@ -28,7 +28,7 @@ namespace UObject.Properties
                 Guid.Deserialize(buffer, asset, ref cursor);
             }
 
-            if (mode == SerializationMode.Normal && EnumName.Value == "None" || mode.HasFlag(SerializationMode.ByteAsEnum))
+            if ((mode == SerializationMode.Normal && EnumName.Value == "None") || mode == SerializationMode.PureByteArray)
             {
                 Value = SpanHelper.ReadByte(buffer, ref cursor);
             }
@@ -41,9 +41,9 @@ namespace UObject.Properties
 
         public override void Serialize(ref Memory<byte> buffer, AssetFile asset, ref int cursor, SerializationMode mode)
         {
-            base.Serialize(ref buffer, asset, ref cursor);
             if (mode == SerializationMode.Normal)
             {
+                base.Serialize(ref buffer, asset, ref cursor);
                 EnumName.Serialize(ref buffer, asset, ref cursor);
                 Guid.Serialize(ref buffer, asset, ref cursor);
             }
