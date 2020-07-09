@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30225.117
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAsset2Json", "UAsset2Json\UAsset2Json.csproj", "{69B77847-9268-4AF7-B821-3511F6709A47}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UAssetParser", "UAssetParser\UAssetParser.csproj", "{5E1C48A3-237C-4B36-BCFD-915F09FB328A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EFD9D04E-0FB4-4DCF-88EE-BC7433920738}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{69B77847-9268-4AF7-B821-3511F6709A47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69B77847-9268-4AF7-B821-3511F6709A47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69B77847-9268-4AF7-B821-3511F6709A47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69B77847-9268-4AF7-B821-3511F6709A47}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E1C48A3-237C-4B36-BCFD-915F09FB328A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E1C48A3-237C-4B36-BCFD-915F09FB328A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E1C48A3-237C-4B36-BCFD-915F09FB328A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E1C48A3-237C-4B36-BCFD-915F09FB328A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {296BD73C-B872-454E-BB7F-DFD641398C16}
+	EndGlobalSection
+EndGlobal
